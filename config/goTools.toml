@@ -1,1 +1,0 @@
-log_level = "info"[Web3Config]  eth_rpc= "https://rpc.flashbots.net"  bsc_rpc= 	"https://rpc.ankr.com/bsc"  matic_rpc= "https://polygon.llamarpc.com"

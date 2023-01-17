@@ -1,1 +1,22 @@
-package web3import (	"errors"	"github.com/ethereum/go-ethereum/ethclient")func NewClient(rpc string) (client *ethclient.Client, err error) {	if rpc == "" {		return nil, errors.New("rpc is null")	}	for i := 0; i < 3; i++ {		client, err = ethclient.Dial(rpc)		if err != nil {			continue		} else {			return client, nil		}	}	return nil, err}
+package web3
+
+import (
+	"errors"
+
+	"github.com/ethereum/go-ethereum/ethclient"
+)
+
+func NewClient(rpc string) (client *ethclient.Client, err error) {
+	if rpc == "" {
+		return nil, errors.New("rpc is null")
+	}
+	for i := 0; i < 3; i++ {
+		client, err = ethclient.Dial(rpc)
+		if err != nil {
+			continue
+		} else {
+			return client, nil
+		}
+	}
+	return nil, err
+}

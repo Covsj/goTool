@@ -1,1 +1,28 @@
-package utilHttpimport (	"fmt"	"testing")func TestHttp(t *testing.T) {	body := `{	"sid": "303509",	"language": "en",	"country": "us",	"client_info": "6b9416bd-5c99-45d1-a4e4-f56560971c1c",	"stream_id": "xiaomi_browser",	"num": 12,	"token": "e492ce5094413d6122af53a22196dce3"}`	request, err := NewHttpRequest("https://openapi-af.op-mobile.opera.com/openapi/xiaomi/news", "POST", body, nil)	if err != nil {		fmt.Println(err)	}	resp, err := DoHttpRequest(request, nil)	if err != nil {		fmt.Println(err)	}	respBody, _ := ReadRespBody(resp)	fmt.Println(string(respBody))}
+package utilHttp
+
+import (
+	"fmt"
+	"testing"
+)
+
+func TestHttp(t *testing.T) {
+	body := `{
+	"sid": "303509",
+	"language": "en",
+	"country": "us",
+	"client_info": "6b9416bd-5c99-45d1-a4e4-f56560971c1c",
+	"stream_id": "xiaomi_browser",
+	"num": 12,
+	"token": "e492ce5094413d6122af53a22196dce3"
+}`
+	request, err := NewHttpRequest("https://openapi-af.op-mobile.opera.com/openapi/xiaomi/news", "POST", body, nil)
+	if err != nil {
+		fmt.Println(err)
+	}
+	resp, err := DoHttpRequest(request, nil)
+	if err != nil {
+		fmt.Println(err)
+	}
+	respBody, _ := ReadRespBody(resp)
+	fmt.Println(string(respBody))
+}
