@@ -5,7 +5,6 @@ import (
 	"crypto/ecdsa"
 	"errors"
 
-	"goTool/config"
 	ERC20 "goTool/web3/erc20"
 
 	"github.com/ethereum/go-ethereum/ethclient"
@@ -16,16 +15,13 @@ import (
 	"github.com/ethereum/go-ethereum/crypto"
 )
 
-func GetTokenBalance(chain string, address string, token string) (string, error) {
+func GetTokenBalance(chain string, address string, token string) (res string, err error) {
 	var client *ethclient.Client
-	switch chain {
-	case "bsc":
-		client = config.DefaultToolConfig.Web3Config.BscClient
-	case "matic":
-		client = config.DefaultToolConfig.Web3Config.MaticClient
-	default:
-		client = config.DefaultToolConfig.Web3Config.EthClient
+
+	if client, err = GetRpcClient(chain); err != nil {
+		return "", err
 	}
+
 	// 获取原生token
 	if token == "" {
 		balance, err := client.BalanceAt(context.Background(), common.HexToAddress(address), nil)

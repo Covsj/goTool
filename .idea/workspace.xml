@@ -6,23 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="ee937701-97db-447b-b476-7b7ffd756ca2" name="Changes" comment="update">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/config/config.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config/goTools.toml" beforeDir="false" afterPath="$PROJECT_DIR$/config/goTool.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/log/log.go" beforeDir="false" afterPath="$PROJECT_DIR$/log/log.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/redis/pool.go" beforeDir="false" afterPath="$PROJECT_DIR$/redis/pool.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/redis/redis.go" beforeDir="false" afterPath="$PROJECT_DIR$/redis/redis.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/text/text.go" beforeDir="false" afterPath="$PROJECT_DIR$/text/text.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/text/text_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/text/text_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utilHttp/client.go" beforeDir="false" afterPath="$PROJECT_DIR$/utilHttp/client.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utilHttp/http_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/utilHttp/http_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utilHttp/request.go" beforeDir="false" afterPath="$PROJECT_DIR$/utilHttp/request.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utilHttp/response.go" beforeDir="false" afterPath="$PROJECT_DIR$/utilHttp/response.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/github.com/ethereum/go-ethereum/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/github.com/ethereum/go-ethereum/go.mod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/github.com/ethereum/go-ethereum/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/vendor/github.com/ethereum/go-ethereum/go.sum" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/web3/account.go" beforeDir="false" afterPath="$PROJECT_DIR$/web3/account.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web3/account_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/web3/account_test.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/web3/client.go" beforeDir="false" afterPath="$PROJECT_DIR$/web3/client.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web3/erc20/erc20.go" beforeDir="false" afterPath="$PROJECT_DIR$/web3/erc20/erc20.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -66,6 +51,7 @@
     <property name="go.formatter.settings.were.checked" value="true" />
     <property name="go.import.settings.migrated" value="true" />
     <property name="go.modules.go.list.on.any.changes.was.set" value="true" />
+    <property name="go.vendoring.notification.had.been.shown" value="true" />
     <property name="go.watchers.conflict.with.on.save.actions.check.performed" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/vendor/github.com" />
     <property name="node.js.detected.package.eslint" value="true" />
