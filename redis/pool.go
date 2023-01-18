@@ -8,8 +8,6 @@ import (
 )
 
 var RedisPool *redis.Pool
-var DefaultMaxIdle = 80
-var DefaultMaxActive = 1000
 
 func NewRedisPool(server string, port int, maxIdle, maxActive int) *redis.Pool {
 	RedisPool = &redis.Pool{

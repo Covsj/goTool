@@ -6,8 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="ee937701-97db-447b-b476-7b7ffd756ca2" name="Changes" comment="update">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web3/account.go" beforeDir="false" afterPath="$PROJECT_DIR$/web3/account.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web3/client.go" beforeDir="false" afterPath="$PROJECT_DIR$/web3/client.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/redis/pool.go" beforeDir="false" afterPath="$PROJECT_DIR$/redis/pool.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/redis/redis.go" beforeDir="false" afterPath="$PROJECT_DIR$/redis/redis.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -56,7 +56,7 @@
     <property name="last_opened_file_path" value="$PROJECT_DIR$/vendor/github.com" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.selected.package.eslint" value="(autodetect)" />
-    <property name="settings.editor.selected.configurable" value="go.vgo" />
+    <property name="settings.editor.selected.configurable" value="actions.on.save" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
