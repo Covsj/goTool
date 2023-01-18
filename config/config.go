@@ -12,12 +12,13 @@ import (
 var DefaultToolConfig *ToolConfig
 
 type Web3Config struct {
-	EthRpc      string            `json:"eth_rpc" toml:"eth_rpc"`
-	BscRpc      string            `json:"bsc_rpc" toml:"bsc_rpc"`
-	MaticRpc    string            `json:"matic_rps" toml:"matic_rpc"`
-	EthClient   *ethclient.Client `json:"eth_client"`
-	BscClient   *ethclient.Client `json:"bsc_client"`
-	MaticClient *ethclient.Client `json:"matic_client"`
+	EthRpc        string            `json:"eth_rpc" toml:"eth_rpc"`
+	BscRpc        string            `json:"bsc_rpc" toml:"bsc_rpc"`
+	MaticRpc      string            `json:"matic_rps" toml:"matic_rpc"`
+	EthClient     *ethclient.Client `json:"eth_client"`
+	BscClient     *ethclient.Client `json:"bsc_client"`
+	MaticClient   *ethclient.Client `json:"matic_client"`
+	DefaultClient *ethclient.Client `json:"default_client"`
 }
 
 type ToolConfig struct {
