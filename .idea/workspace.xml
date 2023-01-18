@@ -4,10 +4,9 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ee937701-97db-447b-b476-7b7ffd756ca2" name="Changes" comment="update">
+    <list default="true" id="ee937701-97db-447b-b476-7b7ffd756ca2" name="Changes" comment="add redis case">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/redis/pool.go" beforeDir="false" afterPath="$PROJECT_DIR$/redis/pool.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/redis/redis.go" beforeDir="false" afterPath="$PROJECT_DIR$/redis/redis.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -101,6 +100,7 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <MESSAGE value="update" />
-    <option name="LAST_COMMIT_MESSAGE" value="update" />
+    <MESSAGE value="add redis case" />
+    <option name="LAST_COMMIT_MESSAGE" value="add redis case" />
   </component>
 </project>
