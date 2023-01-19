@@ -23,7 +23,7 @@ func NewClient(rpc string) (client *ethclient.Client, err error) {
 	return nil, err
 }
 
-func GetRpcClient(chain string) (client *ethclient.Client, err error) {
+func GetRpcClientByName(chain string) (client *ethclient.Client, err error) {
 	switch chain {
 	case "bsc":
 		if config.DefaultToolConfig.Web3Config.BscClient == nil {
@@ -37,6 +37,45 @@ func GetRpcClient(chain string) (client *ethclient.Client, err error) {
 		}
 		client = config.DefaultToolConfig.Web3Config.BscClient
 	case "matic":
+		if config.DefaultToolConfig.Web3Config.MaticClient == nil {
+			for i := 0; i < 3; i++ {
+				client, err = ethclient.Dial(config.DefaultToolConfig.Web3Config.MaticRpc)
+				if err != nil {
+					continue
+				}
+			}
+			config.DefaultToolConfig.Web3Config.MaticClient = client
+		}
+		client = config.DefaultToolConfig.Web3Config.MaticClient
+	default:
+		if config.DefaultToolConfig.Web3Config.EthClient == nil {
+			for i := 0; i < 3; i++ {
+				client, err = ethclient.Dial(config.DefaultToolConfig.Web3Config.EthRpc)
+				if err != nil {
+					continue
+				}
+			}
+			config.DefaultToolConfig.Web3Config.EthClient = client
+		}
+		client = config.DefaultToolConfig.Web3Config.EthClient
+	}
+	return client, err
+}
+
+func GetRpcClientByChainId(chainId string) (client *ethclient.Client, err error) {
+	switch chainId {
+	case "56":
+		if config.DefaultToolConfig.Web3Config.BscClient == nil {
+			for i := 0; i < 3; i++ {
+				client, err = ethclient.Dial(config.DefaultToolConfig.Web3Config.BscRpc)
+				if err != nil {
+					continue
+				}
+			}
+			config.DefaultToolConfig.Web3Config.BscClient = client
+		}
+		client = config.DefaultToolConfig.Web3Config.BscClient
+	case "137":
 		if config.DefaultToolConfig.Web3Config.MaticClient == nil {
 			for i := 0; i < 3; i++ {
 				client, err = ethclient.Dial(config.DefaultToolConfig.Web3Config.MaticRpc)

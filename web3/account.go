@@ -18,7 +18,7 @@ import (
 func GetTokenBalance(chain string, address string, token string) (res string, err error) {
 	var client *ethclient.Client
 
-	if client, err = GetRpcClient(chain); err != nil {
+	if client, err = GetRpcClientByName(chain); err != nil {
 		return "", err
 	}
 
