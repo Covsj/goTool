@@ -1,10 +1,12 @@
-FROM centos
+FROM centos:7
 
 LABEL maintainer="Covsj"
 
-RUN apt-get update && apt-get install vim -y
+USER root
 
-ADD ./goiTool/ /code/goTool/
+RUN yum -y install vim
+
+COPY ./ /code/goTool/
 
 RUN cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && echo 'Asia/Shanghai' >/etc/timezone
 
