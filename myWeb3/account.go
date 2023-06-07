@@ -1,11 +1,11 @@
-package web3
+package myWeb3
 
 import (
 	"context"
 	"crypto/ecdsa"
 	"errors"
 
-	ERC20 "goTool/web3/erc20"
+	ERC20 "goTool/myWeb3/erc20"
 
 	"github.com/ethereum/go-ethereum/ethclient"
 
@@ -45,7 +45,7 @@ func GetTokenBalance(chain string, address string, token string) (res string, er
 	}
 }
 
-func GetNewWallet() (priKey string, address string, err error) {
+func CreateNewWallet() (priKey string, address string, err error) {
 	privateKey, err := crypto.GenerateKey()
 
 	if err != nil {

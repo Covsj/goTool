@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 
 	"goTool/model"
-	"goTool/utilHttp"
+	"goTool/myHttp"
 )
 
 func getBaseApiUrl(chainId string) string {
@@ -19,7 +19,7 @@ func CheckAllowance(chainId, tokenAddress, walletAddress string, url string) (st
 		url = getBaseApiUrl(chainId)
 	}
 	url += "/approve/allowance?tokenAddress=" + tokenAddress + "&walletAddress=" + walletAddress
-	resp, err := utilHttp.CallHttp(url, "GET", "", nil)
+	resp, err := myHttp.CallHttp(url, "GET", "", nil)
 	if err != nil {
 		return "", err
 	}
@@ -38,7 +38,7 @@ func GetApproveTransaction(chainId, tokenAddress, amount string) (*model.Web3Cal
 	if amount != "" {
 		url += "&amount=" + amount
 	}
-	resp, err := utilHttp.CallHttp(url, "GET", "", nil)
+	resp, err := myHttp.CallHttp(url, "GET", "", nil)
 	if err != nil {
 		return nil, err
 	}

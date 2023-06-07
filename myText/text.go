@@ -1,4 +1,4 @@
-package text
+package myText
 
 import "strings"
 

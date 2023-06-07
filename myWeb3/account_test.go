@@ -1,4 +1,4 @@
-package web3
+package myWeb3
 
 import (
 	"fmt"
@@ -16,5 +16,5 @@ func TestGetTokenBalance(t *testing.T) {
 }
 
 func TestGetNewWallet(t *testing.T) {
-	fmt.Println(GetNewWallet())
+	fmt.Println(CreateNewWallet())
 }

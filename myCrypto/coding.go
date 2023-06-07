@@ -1,4 +1,4 @@
-package crypto
+package myCrypto
 
 import (
 	"encoding/base64"

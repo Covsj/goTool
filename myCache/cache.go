@@ -1,9 +1,9 @@
-package util
+package MyCache
 
 import (
 	"sync"
 
-	"goTool/cache/lru"
+	"goTool/myCache/lru"
 )
 
 type Cache struct {

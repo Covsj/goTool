@@ -1,11 +1,11 @@
-package email
+package myUtils
 
 import (
 	"encoding/json"
 	"strconv"
 	"time"
 
-	"goTool/utilHttp"
+	"goTool/myHttp"
 )
 
 var domain = "iubridge.com"
@@ -44,7 +44,7 @@ type Email struct {
 func GetEid(name string, senderName string) (Eid string, err error) {
 	url := "https://www.linshi-email.com/api/v1/refreshmessage/61b6348b42316c1967348fbc347b3c70/" + name + "@" + domain + "?" +
 		"t=" + strconv.Itoa(int(time.Now().Unix())) + "000"
-	resp, err := utilHttp.CallHttp(url, "GET", "", nil)
+	resp, err := myHttp.CallHttp(url, "GET", "", nil)
 	if err != nil {
 		return "", err
 	}
@@ -63,7 +63,7 @@ func GetEid(name string, senderName string) (Eid string, err error) {
 // GetEmail 传入邮件Eid 获取邮件内容
 func GetEmail(Eid string) (string, error) {
 	url := "https://www.linshi-email.com/api/v1/getemailContent/" + Eid
-	resp, err := utilHttp.CallHttp(url, "GET", "", nil)
+	resp, err := myHttp.CallHttp(url, "GET", "", nil)
 	if err != nil {
 		return "", err
 	}

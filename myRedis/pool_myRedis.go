@@ -1,4 +1,4 @@
-package redis
+package myRedis
 
 import (
 	"fmt"
@@ -7,10 +7,10 @@ import (
 	"github.com/garyburd/redigo/redis"
 )
 
-var RedisPool *redis.Pool
+var redisPool *redis.Pool
 
 func NewRedisPool(server string, port int, maxIdle, maxActive, db int) *redis.Pool {
-	RedisPool = &redis.Pool{
+	redisPool = &redis.Pool{
 		MaxIdle:     maxIdle,
 		MaxActive:   maxActive,
 		IdleTimeout: time.Duration(5) * time.Second,
@@ -19,5 +19,5 @@ func NewRedisPool(server string, port int, maxIdle, maxActive, db int) *redis.Po
 			return redis.Dial("tcp", hostPort, redis.DialDatabase(db))
 		},
 	}
-	return RedisPool
+	return redisPool
 }

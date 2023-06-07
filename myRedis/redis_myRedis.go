@@ -1,4 +1,4 @@
-package redis
+package myRedis
 
 import (
 	"errors"
@@ -15,8 +15,8 @@ func Ping(pool *redis.Pool) (string, error) {
 	return redis.String(conn.Do("ping"))
 }
 
-func RedisSetex(key, value interface{}, expireTime int) (err error) {
-	conn := RedisPool.Get()
+func RedisSetEx(key, value interface{}, expireTime int) (err error) {
+	conn := redisPool.Get()
 	if conn == nil {
 		return errors.New("get nil redis connection")
 	}

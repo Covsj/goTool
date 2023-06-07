@@ -4,7 +4,7 @@ log_level = "info"
   eth_rpc= "https://rpc.flashbots.net"
   bsc_rpc= 	"https://rpc.ankr.com/bsc"
   matic_rpc= "https://polygon.llamarpc.com"
-
+  zksync_rpc = "https://mainnet.era.zksync.io"
 
 
 
