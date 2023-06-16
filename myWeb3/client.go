@@ -3,8 +3,7 @@ package myWeb3
 import (
 	"errors"
 
-	"goTool/config"
-
+	"github.com/Covsj/goTool/config"
 	"github.com/ethereum/go-ethereum/ethclient"
 )
 

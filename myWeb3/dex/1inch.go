@@ -3,8 +3,8 @@ package dex
 import (
 	"encoding/json"
 
-	"goTool/model"
-	"goTool/myHttp"
+	"github.com/Covsj/goTool/model"
+	"github.com/Covsj/goTool/myHttp"
 )
 
 func getBaseApiUrl(chainId string) string {

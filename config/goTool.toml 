@@ -5,6 +5,3 @@ log_level = "info"
   bsc_rpc= 	"https://rpc.ankr.com/bsc"
   matic_rpc= "https://polygon.llamarpc.com"
   zksync_rpc = "https://mainnet.era.zksync.io"
-
-
-

@@ -3,7 +3,7 @@ package MyCache
 import (
 	"sync"
 
-	"goTool/myCache/lru"
+	"github.com/Covsj/goTool/myCache/lru"
 )
 
 type Cache struct {

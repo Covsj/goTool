@@ -3,7 +3,7 @@ package config
 import (
 	"runtime"
 
-	"goTool/log"
+	"opera-news-openapi/pkg/log"
 
 	"github.com/BurntSushi/toml"
 	"github.com/ethereum/go-ethereum/ethclient"

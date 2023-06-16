@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"time"
 
-	"goTool/myHttp"
+	"github.com/Covsj/goTool/myHttp"
 )
 
 var domain = "iubridge.com"
