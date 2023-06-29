@@ -3,12 +3,13 @@ package myUtils
 import (
 	"encoding/json"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/Covsj/goTool/myHttp"
 )
 
-var domain = "iubridge.com"
+var Domain = "iubridge.com"
 
 type Resp struct {
 	List []struct {
@@ -42,7 +43,11 @@ type Email struct {
 
 // GetEid 传入邮箱名和想获取邮件发件人 返回邮箱最新邮件id
 func GetEid(name string, senderName string) (Eid string, err error) {
-	url := "https://www.linshi-email.com/api/v1/refreshmessage/61b6348b42316c1967348fbc347b3c70/" + name + "@" + domain + "?" +
+	if strings.Contains(name, "@") {
+		index := strings.Index(name, "@")
+		name = name[:index]
+	}
+	url := "https://www.linshi-email.com/api/v1/refreshmessage/61b6348b42316c1967348fbc347b3c70/" + name + "@" + Domain + "?" +
 		"t=" + strconv.Itoa(int(time.Now().Unix())) + "000"
 	resp, err := myHttp.CallHttp(url, "GET", "", nil)
 	if err != nil {
@@ -69,6 +74,6 @@ func GetEmail(Eid string) (string, error) {
 	}
 	res := Email{}
 	_ = json.Unmarshal(resp, &res)
-	e := res.Data.Html
+	e := res.Data.Subject
 	return e, nil
 }
