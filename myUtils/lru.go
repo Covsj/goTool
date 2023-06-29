@@ -1,4 +1,4 @@
-package lru
+package myUtils
 
 import "container/list"
 
@@ -51,14 +51,6 @@ func (c *Cache) Add(key Key, value interface{}) {
 	if c.MaxEntries != 0 && c.ll.Len() > c.MaxEntries {
 		c.RemoveOldest()
 	}
-}
-
-func (c *Cache) Contains(key Key) bool {
-	if c.cache == nil {
-		return false
-	}
-	_, hit := c.cache[key]
-	return hit
 }
 
 // Get looks up a key's value from the cache.
