@@ -9,6 +9,7 @@ import (
 )
 
 var Domain = "iubridge.com"
+var DefaultId = "61b6348b42316c1967348fbc347b3c70"
 
 type Resp struct {
 	List []struct {
@@ -41,6 +42,8 @@ type Email struct {
 }
 
 func GetAEmailAccount() string {
+	DefaultId = GetMd5(time.Now().String())
+
 	rand.Seed(time.Now().UnixNano())
 	pre := GetMd5(time.Now().String())[:rand.Intn(3)+6]
 	email := pre + "@" + Domain
@@ -53,7 +56,7 @@ func GetEid(name string, senderName string) (Eid string, err error) {
 		index := strings.Index(name, "@")
 		name = name[:index]
 	}
-	url := "https://www.linshi-email.com/api/v1/refreshmessage/61b6348b42316c1967348fbc347b3c70/" + name + "@" + Domain + "?" +
+	url := "https://www.linshi-email.com/api/v1/refreshmessage/" + DefaultId + "/" + name + "@" + Domain + "?" +
 		"t=" + strconv.Itoa(int(time.Now().Unix())) + "000"
 	_, body, err := CallHttp(url, "GET", "", nil)
 	if err != nil {
