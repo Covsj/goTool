@@ -1,11 +1,11 @@
-package myWeb3
+package myUtils
 
 import (
 	"context"
 	"crypto/ecdsa"
 	"errors"
 
-	ERC20 "github.com/Covsj/goTool/myWeb3/erc20"
+	ERC20 "github.com/Covsj/goTool/myUtils/erc20"
 	"github.com/ethereum/go-ethereum/ethclient"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
@@ -17,9 +17,7 @@ import (
 func GetTokenBalance(chain string, address string, token string) (res string, err error) {
 	var client *ethclient.Client
 
-	if client, err = GetRpcClientByName(chain); err != nil {
-		return "", err
-	}
+	client = GetRpcClientByName(chain)
 
 	// 获取原生token
 	if token == "" {

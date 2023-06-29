@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 
 	"github.com/Covsj/goTool/model"
-	"github.com/Covsj/goTool/myHttp"
+	"github.com/Covsj/goTool/myUtils"
 )
 
 func getBaseApiUrl(chainId string) string {
@@ -19,13 +19,13 @@ func CheckAllowance(chainId, tokenAddress, walletAddress string, url string) (st
 		url = getBaseApiUrl(chainId)
 	}
 	url += "/approve/allowance?tokenAddress=" + tokenAddress + "&walletAddress=" + walletAddress
-	resp, err := myHttp.CallHttp(url, "GET", "", nil)
+	_, body, err := myUtils.CallHttp(url, "GET", "", nil)
 	if err != nil {
 		return "", err
 	}
 
 	var m model.CheckAllowance
-	err = json.Unmarshal(resp, &m)
+	err = json.Unmarshal(body, &m)
 	if err != nil {
 		return "", err
 	}
@@ -38,12 +38,12 @@ func GetApproveTransaction(chainId, tokenAddress, amount string) (*model.Web3Cal
 	if amount != "" {
 		url += "&amount=" + amount
 	}
-	resp, err := myHttp.CallHttp(url, "GET", "", nil)
+	_, body, err := myUtils.CallHttp(url, "GET", "", nil)
 	if err != nil {
 		return nil, err
 	}
 	m := &model.Web3Call{GasLimit: "200000"}
-	err = json.Unmarshal(resp, m)
+	err = json.Unmarshal(body, m)
 	if err != nil {
 		return nil, err
 	}

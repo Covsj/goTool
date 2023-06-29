@@ -1,4 +1,4 @@
-package myWeb3
+package myUtils
 
 import (
 	"context"
@@ -13,10 +13,7 @@ import (
 )
 
 func SignerTransaction(priKey, fromAddress, chainId string, to, gasPrice, gasLimit, value, data string) (string, error) {
-	client, err := GetRpcClientByChainId(chainId)
-	if err != nil {
-		return "", err
-	}
+	client := GetRpcClientByChainId(chainId)
 	privateKey, err := crypto.HexToECDSA(priKey)
 	if err != nil {
 		return "", err
