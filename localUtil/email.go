@@ -31,11 +31,11 @@ type Email struct {
 			Address string `json:"address"`
 			Name    string `json:"name"`
 		} `json:"from"`
-		Date      int64  `json:"date"`
-		Html      string `json:"html"`
-		MessageId string `json:"messageId"`
-		Name      string `json:"name"`
-		Eid       string `json:"eid"`
+		Date      int64       `json:"date"`
+		Html      interface{} `json:"html"`
+		MessageId string      `json:"messageId"`
+		Name      string      `json:"name"`
+		Eid       string      `json:"eid"`
 	} `json:"data"`
 	Status string `json:"status"`
 }
