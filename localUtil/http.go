@@ -1,4 +1,4 @@
-package myUtils
+package localUtil
 
 import (
 	"bytes"

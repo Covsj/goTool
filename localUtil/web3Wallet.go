@@ -1,11 +1,11 @@
-package myUtils
+package localUtil
 
 import (
 	"context"
 	"crypto/ecdsa"
 	"errors"
 
-	ERC20 "github.com/Covsj/goTool/myUtils/erc20"
+	ERC20 "github.com/Covsj/goTool/localUtil/erc20"
 	"github.com/ethereum/go-ethereum/ethclient"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
