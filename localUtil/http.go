@@ -8,8 +8,6 @@ import (
 	"strings"
 	"sync"
 	"time"
-
-	"github.com/abursavich/nett"
 )
 
 var cp *ClientPool
@@ -110,17 +108,7 @@ func newClientPool() {
 	cp = &ClientPool{
 		pool: &sync.Pool{
 			New: func() interface{} {
-				dialer := &nett.Dialer{
-					Resolver: &nett.CacheResolver{TTL: 5 * time.Minute},
-					IPFilter: nett.DualStack,
-					Timeout:  2 * time.Second,
-				}
 				client := &http.Client{
-					Transport: &http.Transport{
-						Dial:                dialer.Dial,
-						MaxIdleConnsPerHost: 1000,
-						IdleConnTimeout:     time.Second * 10,
-					},
 					Timeout: time.Second * 10,
 				}
 				return client
