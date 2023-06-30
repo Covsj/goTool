@@ -85,3 +85,21 @@ func GetEmail(Eid string) (*Email, error) {
 	}
 	return res, nil
 }
+
+func GetEmailAll(name string, senderName string) *Email {
+	for {
+		time.Sleep(1 * time.Second)
+		eid, err := GetEid(name, senderName)
+		if err != nil {
+			continue
+		}
+		if eid == "" {
+			continue
+		}
+		email, err := GetEmail(eid)
+		if err != nil {
+			continue
+		}
+		return email
+	}
+}
