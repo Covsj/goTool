@@ -41,11 +41,13 @@ type Email struct {
 	Status string `json:"status"`
 }
 
-func GetAEmailAccount() string {
+func GetAEmailAccount(accountLength int) string {
+	if accountLength == 0 {
+		accountLength = 6
+	}
 	DefaultId = GetMd5(time.Now().String())
-
 	rand.Seed(time.Now().UnixNano())
-	pre := GetMd5(time.Now().String())[:rand.Intn(3)+6]
+	pre := GetMd5(time.Now().String())[:rand.Intn(3)+accountLength]
 	email := pre + "@" + Domain
 	return email
 }
