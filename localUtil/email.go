@@ -41,11 +41,13 @@ type Email struct {
 	Status string `json:"status"`
 }
 
-func GetAEmailAccount() string {
+func GetAEmailAccount(accountLength int) string {
+	if accountLength == 0 {
+		accountLength = 6
+	}
 	//DefaultId = GetMd5(time.Now().String())
-
 	rand.Seed(time.Now().UnixNano())
-	pre := GetMd5(time.Now().String())[:rand.Intn(3)+6]
+	pre := GetMd5(time.Now().String())[:rand.Intn(3)+accountLength]
 	email := pre + "@" + Domain
 	return email
 }
@@ -87,4 +89,22 @@ func GetEmail(Eid string) (*Email, error) {
 		return nil, err
 	}
 	return res, nil
+}
+
+func GetEmailAll(name string, senderName string) *Email {
+	for {
+		time.Sleep(1 * time.Second)
+		eid, err := GetEid(name, senderName)
+		if err != nil {
+			continue
+		}
+		if eid == "" {
+			continue
+		}
+		email, err := GetEmail(eid)
+		if err != nil {
+			continue
+		}
+		return email
+	}
 }
