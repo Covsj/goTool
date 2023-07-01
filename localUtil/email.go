@@ -9,7 +9,7 @@ import (
 )
 
 var Domain = "iubridge.com"
-var DefaultId = "61b6348b42316c1967348fbc347b3c70"
+var DefaultId = "8e471dba9d6a1066f5a01b8e7c13b2cc"
 
 type Resp struct {
 	List []struct {
@@ -42,7 +42,7 @@ type Email struct {
 }
 
 func GetAEmailAccount() string {
-	DefaultId = GetMd5(time.Now().String())
+	//DefaultId = GetMd5(time.Now().String())
 
 	rand.Seed(time.Now().UnixNano())
 	pre := GetMd5(time.Now().String())[:rand.Intn(3)+6]
