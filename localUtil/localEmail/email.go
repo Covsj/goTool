@@ -1,0 +1,5 @@
+package localEmail
+
+func GetNewEmail() {
+
+}
