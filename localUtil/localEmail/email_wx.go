@@ -67,6 +67,12 @@ func init() {
 			Host:   "mail.ynnmx.com",
 			Domain: "lemonclo.com",
 		},
+		&WxEmail{
+			Name:   "快邮箱",
+			Token:  "GMxrUqbL9APnCBLHdlRqWamMBCc3Cavu",
+			Host:   "mail.fyxkpro.cn",
+			Domain: "mail.fyxkpro.cn",
+		},
 	}
 }
 
