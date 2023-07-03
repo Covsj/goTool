@@ -21,17 +21,10 @@ type WxEmail struct {
 	Domain string `json:"domain"`
 }
 
-func NewWxEmail(name, token, host, domain string) *WxEmail {
-	return &WxEmail{
-		Name:   name,
-		Token:  token,
-		Host:   host,
-		Domain: domain,
-	}
-}
+var List []*WxEmail
 
-func NewEmailTools() []*WxEmail {
-	res := []*WxEmail{
+func init() {
+	List = []*WxEmail{
 		&WxEmail{
 			Name:   "邮箱快捷助手",
 			Token:  "juDjJIl8NMnwLyvwaEKR3zuy1N7kIyQs",
@@ -63,7 +56,15 @@ func NewEmailTools() []*WxEmail {
 			Domain: "yx.kuaiquyun.cn",
 		},
 	}
-	return res
+}
+
+func NewWxEmail(name, token, host, domain string) *WxEmail {
+	return &WxEmail{
+		Name:   name,
+		Token:  token,
+		Host:   host,
+		Domain: domain,
+	}
 }
 
 func (cfg *WxEmail) SetNewWxEmail(accountLength int) string {
