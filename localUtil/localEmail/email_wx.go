@@ -14,15 +14,15 @@ import (
 
 var client = &http.Client{}
 
-type VxEmail struct {
+type WxEmail struct {
 	Name   string `json:"name"`
 	Token  string `json:"token"`
 	Host   string `json:"host"`
 	Domain string `json:"domain"`
 }
 
-func NewWxEmail(name, token, host, domain string) *VxEmail {
-	return &VxEmail{
+func NewWxEmail(name, token, host, domain string) *WxEmail {
+	return &WxEmail{
 		Name:   name,
 		Token:  token,
 		Host:   host,
@@ -30,27 +30,27 @@ func NewWxEmail(name, token, host, domain string) *VxEmail {
 	}
 }
 
-func NewEmailTools() []*VxEmail {
-	res := []*VxEmail{
-		&VxEmail{
+func NewEmailTools() []*WxEmail {
+	res := []*WxEmail{
+		&WxEmail{
 			Name:   "邮箱快捷助手",
 			Token:  "juDjJIl8NMnwLyvwaEKR3zuy1N7kIyQs",
 			Host:   "mail.shiyinuoche.com",
 			Domain: "mail.shiyinuoche.com",
 		},
-		&VxEmail{
+		&WxEmail{
 			Name:   "随机邮箱",
 			Token:  "OVYPbGekfMBmQkCIP42VMRfq4scAwG09",
 			Host:   "mail.11811.cn",
 			Domain: "0dg.top",
 		},
-		&VxEmail{
+		&WxEmail{
 			Name:   "个性随机邮箱",
 			Token:  "s27PlGt7op1NEvVdVm3PNTslLId1dEjR",
 			Host:   "email.1718u.com",
 			Domain: "email.nm.cn",
 		},
-		&VxEmail{
+		&WxEmail{
 			Name:   "邮箱",
 			Token:  "zSh1bZL8yCMLdyNgqIHGCgbvEMw4Uc4t",
 			Host:   "mail.pianyueniao.top",
@@ -60,7 +60,7 @@ func NewEmailTools() []*VxEmail {
 	return res
 }
 
-func (cfg *VxEmail) SetNewWxEmail(accountLength int) string {
+func (cfg *WxEmail) SetNewWxEmail(accountLength int) string {
 	var body string
 	if accountLength != 0 {
 		rand.Seed(time.Now().UnixNano())
@@ -97,7 +97,7 @@ func (cfg *VxEmail) SetNewWxEmail(accountLength int) string {
 	return res.Data.Fulldomain
 }
 
-func (cfg *VxEmail) GetEmailMsgFromWx(email string) []WxEmailRespData {
+func (cfg *WxEmail) GetEmailMsgFromWx(email string) []WxEmailRespData {
 	var result []WxEmailRespData
 
 	request, _ := http.NewRequest("POST", "https://"+cfg.Host+"/api/mailbox/getnewest5", nil)
