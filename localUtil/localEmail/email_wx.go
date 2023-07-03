@@ -73,6 +73,12 @@ func init() {
 			Host:   "mail.fyxkpro.cn",
 			Domain: "mail.fyxkpro.cn",
 		},
+		&WxEmail{
+			Name:   "微邮箱",
+			Token:  "AuRnqEbxcxMICtoRDhE6La3VhICffAb5",
+			Host:   "yx.mageline.cc",
+			Domain: "wyx.xjcms.cc",
+		},
 	}
 }
 
