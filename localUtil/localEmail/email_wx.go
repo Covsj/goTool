@@ -55,6 +55,18 @@ func init() {
 			Host:   "yx.kuaiquyun.cn",
 			Domain: "yx.kuaiquyun.cn",
 		},
+		&WxEmail{
+			Name:   "极速邮箱管家",
+			Token:  "TRe8Q6jQCVh0O6HS2r9tmRna2vqkIDSe",
+			Host:   "x.chuanyueshikong.cloud",
+			Domain: "shenmak.cn",
+		},
+		&WxEmail{
+			Name:   "无限邮箱",
+			Token:  "BHlsuXDYzT2L9l6G083nXEoRXTkaCJAI",
+			Host:   "mail.ynnmx.com",
+			Domain: "lemonclo.com",
+		},
 	}
 }
 
