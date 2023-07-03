@@ -21,6 +21,15 @@ type VxEmail struct {
 	Domain string `json:"domain"`
 }
 
+func NewWxEmail(name, token, host, domain string) *VxEmail {
+	return &VxEmail{
+		Name:   name,
+		Token:  token,
+		Host:   host,
+		Domain: domain,
+	}
+}
+
 func NewEmailTools() []*VxEmail {
 	res := []*VxEmail{
 		&VxEmail{
