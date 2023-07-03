@@ -56,6 +56,12 @@ func NewEmailTools() []*WxEmail {
 			Host:   "mail.pianyueniao.top",
 			Domain: "pianyueniao.top",
 		},
+		&WxEmail{
+			Name:   "快趣邮箱",
+			Token:  "fU1egC20e93jZgvvwkxZASEWPBn6bWWQ",
+			Host:   "yx.kuaiquyun.cn",
+			Domain: "yx.kuaiquyun.cn",
+		},
 	}
 	return res
 }
