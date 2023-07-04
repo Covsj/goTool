@@ -91,6 +91,12 @@ func init() {
 			Host:   "mail.qizs.cn",
 			Domain: "colingpt.pro",
 		},
+		&WxEmail{
+			Name:   "个人无限邮箱",
+			Token:  "nEGeek0P1Bg4MKP8vgjdJJregcjZXNPC",
+			Host:   "mail.picyw.com",
+			Domain: "52mail.cab",
+		},
 	}
 }
 
