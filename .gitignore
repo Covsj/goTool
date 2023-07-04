@@ -4,5 +4,5 @@ goTool.iml
 release/
 ./goTool
 memo
-./main
+./main/*
 
