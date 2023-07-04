@@ -79,6 +79,18 @@ func init() {
 			Host:   "yx.mageline.cc",
 			Domain: "wyx.xjcms.cc",
 		},
+		&WxEmail{
+			Name:   "万能邮箱",
+			Token:  "lY54N67b5JRy9d4rYurp3n8pqYEcVIFS",
+			Host:   "yx.nuotui.vip",
+			Domain: "yx.nuotui.vip",
+		},
+		&WxEmail{
+			Name:   "临时邮箱生成器",
+			Token:  "zuUyZm6utiKnHvQw0WHtOkSHzFUFCYGg",
+			Host:   "mail.qizs.cn",
+			Domain: "colingpt.pro",
+		},
 	}
 }
 
