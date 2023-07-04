@@ -95,12 +95,16 @@ func init() {
 }
 
 func NewWxEmail(name, token, host, domain string) *WxEmail {
-	return &WxEmail{
-		Name:   name,
-		Token:  token,
-		Host:   host,
-		Domain: domain,
+	if name != "" && token != "" && host != "" && domain != "" {
+		return &WxEmail{
+			Name:   name,
+			Token:  token,
+			Host:   host,
+			Domain: domain,
+		}
 	}
+	rand.Seed(time.Now().UnixNano())
+	return List[rand.Intn(len(List))]
 }
 
 func (cfg *WxEmail) SetNewWxEmail(accountLength int) string {
