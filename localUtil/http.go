@@ -26,17 +26,15 @@ func init() {
 	newClientPool()
 }
 
-func NewHttpRequest(url, method, body string, header map[string][]string) (*http.Request, error) {
+func NewHttpRequest(url, method, body string, header map[string]string) (*http.Request, error) {
 	if method == "" {
 		method = http.MethodPost
 	}
 	req, err := http.NewRequest(method, url, ioutil.NopCloser(bytes.NewBuffer([]byte(body))))
 	req.ContentLength = int64(len(body))
-	if header != nil {
-		for k, vv := range header {
-			for _, v := range vv {
-				req.Header.Add(k, v)
-			}
+	if len(header) > 0 {
+		for k, v := range header {
+			req.Header.Set(k, v)
 		}
 	} else {
 		req.Header.Set("User-Agent", DefaultUa)
@@ -88,7 +86,7 @@ func ReadRespBody(resp *http.Response) (body []byte, err error) {
 	return
 }
 
-func CallHttp(url, method, body string, header map[string][]string) (*http.Response, []byte, error) {
+func CallHttp(url, method, body string, header map[string]string) (*http.Response, []byte, error) {
 	req, err := NewHttpRequest(url, method, body, header)
 	if err != nil {
 		return nil, nil, err
