@@ -16,7 +16,7 @@ import (
 
 func main() {
 	log.Println("Connecting to server...")
-	err := emailListByUid("imap.mail.ru:993", "default@yx5.covsj.top", "kX1fr08gwPRaYSDz65Tc")
+	err := emailListByUid("imap.mail.ru:993", "", "")
 	if err != nil {
 		log.Fatal(err)
 	}
