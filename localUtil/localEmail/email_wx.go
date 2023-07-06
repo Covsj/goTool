@@ -97,6 +97,12 @@ func init() {
 			Host:   "mail.picyw.com",
 			Domain: "52mail.cab",
 		},
+		&WxEmail{
+			Name:   "我的个人邮箱",
+			Token:  "4mB1xvGMLO80CrmFT42oU40FVjF0NjPh",
+			Host:   "mail.sihong.vip",
+			Domain: "156.email",
+		},
 	}
 }
 
