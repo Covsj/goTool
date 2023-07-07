@@ -67,7 +67,7 @@ func ReadRespBody(resp *http.Response) (body []byte, err error) {
 			_ = resp.Body.Close()
 		}
 	}()
-	if strings.Index(strings.ToLower(resp.Header.Get("Content-Type")), "gzip") >= 0 {
+	if strings.Index(strings.ToLower(resp.Header.Get("Content-Encoding")), "gzip") >= 0 {
 		reader, err := gzip.NewReader(resp.Body)
 		if err != nil {
 			return nil, err
