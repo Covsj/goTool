@@ -14,6 +14,6 @@ func main() {
 	defer c.Close()
 	message := localEmail.GetImapEmailMessage(c, 10)
 	for _, email := range message {
-		fmt.Println(email.From, email.To, email.Subject, email.Body)
+		fmt.Println("From: ", email.From, "To: ", email.To, "Subject: ", email.Subject, "Body: ", email.Body)
 	}
 }
