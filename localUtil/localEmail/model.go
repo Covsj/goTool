@@ -42,3 +42,11 @@ type WxEmailRespData struct {
 	Uid             int    `json:"uid"`
 	Paid            int    `json:"paid"`
 }
+
+type ImapEmail struct {
+	TimeStamp int64  `json:"time_stamp"`
+	From      string `json:"from"`
+	To        string `json:"to"`
+	Subject   string `json:"subject"`
+	Body      string `json:"body"`
+}

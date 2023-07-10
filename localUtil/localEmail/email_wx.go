@@ -12,7 +12,7 @@ import (
 	"github.com/Covsj/goTool/localUtil"
 )
 
-var client = &http.Client{}
+var htppClient = &http.Client{}
 
 type WxEmail struct {
 	Name   string `json:"name"`
@@ -136,7 +136,7 @@ func (cfg *WxEmail) SetNewWxEmail(accountLength int) string {
 	req, _ := http.NewRequest("POST", "https://"+cfg.Domain+"/api/mailbox/rand_emprefix",
 		strings.NewReader(body))
 	req.Header.Set("token", cfg.Token)
-	resp, err := client.Do(req)
+	resp, err := htppClient.Do(req)
 	if err != nil {
 		log.Error("设置邮箱失败 ", err.Error())
 		return ""
@@ -161,7 +161,7 @@ func (cfg *WxEmail) GetEmailMsgFromWx(email string) []WxEmailRespData {
 
 	request, _ := http.NewRequest("POST", "https://"+cfg.Host+"/api/mailbox/getnewest5", nil)
 	request.Header.Add("token", cfg.Token)
-	resp, err := client.Do(request)
+	resp, err := htppClient.Do(request)
 	if err != nil {
 		log.Error("获取验证码失败 Do ", err.Error())
 		return result
