@@ -80,6 +80,14 @@ func TestHeader(t *testing.T) {
 	if h.FieldsByKey("X-I-Dont-Exist").Next() {
 		t.Errorf("FieldsByKey(non-existing).Next() returned true, want false")
 	}
+
+	want = []string{
+		"from example.com by example.org",
+		"from localhost by example.com",
+	}
+	if l := h.Values("Received"); !reflect.DeepEqual(l, want) {
+		t.Errorf("Values(\"Received\") reported incorrect values: got \n%#v\n but want \n%#v", l, want)
+	}
 }
 
 func TestHeader_Set(t *testing.T) {
@@ -219,32 +227,6 @@ func TestInvalidHeader(t *testing.T) {
 	_, err := ReadHeader(r)
 	if err == nil {
 		t.Errorf("No error thrown")
-	}
-}
-
-func TestReadHeader_TooBig(t *testing.T) {
-	testHeader := "Received: from example.com by example.org\r\n" +
-		"Received: from localhost by example.com\r\n" +
-		"To: Taki Tachibana <taki.tachibana@example.org> " + strings.Repeat("A", 4000) + "\r\n" +
-		"From: Mitsuha Miyamizu <mitsuha.miyamizu@example.com>\r\n\r\n"
-	_, err := ReadHeader(bufio.NewReader(strings.NewReader(testHeader)))
-	if err == nil {
-		t.Fatalf("ReadHeader() succeeded")
-	}
-	if _, ok := err.(TooBigError); !ok {
-		t.Fatalf("Not TooBigError returned: %T", err)
-	}
-
-	testHeader = "Received: from example.com by example.org\r\n" +
-		"Received: from localhost by example.com\r\n" +
-		"To: Taki Tachibana <taki.tachibana@example.org>\r\n" +
-		strings.Repeat("From: Mitsuha Miyamizu <mitsuha.miyamizu@example.com>\r\n", 1001) + "\r\n"
-	_, err = ReadHeader(bufio.NewReader(strings.NewReader(testHeader)))
-	if err == nil {
-		t.Fatalf("ReadHeader() succeeded")
-	}
-	if _, ok := err.(TooBigError); !ok {
-		t.Fatalf("Not TooBigError returned: %T", err)
 	}
 }
 
@@ -457,7 +439,7 @@ func TestWriteHeader_continued(t *testing.T) {
 }
 
 var incorrectFormatHeaderFieldTests = []struct {
-	k, v      string
+	k, v string
 }{
 	{
 		k: "DKIM Signature",
@@ -499,7 +481,7 @@ func TestWriteHeader_failed(t *testing.T) {
 }
 
 var incorrectFormatMultipleHeaderFieldTests = []struct {
-	k1, k2, v1, v2      string
+	k1, k2, v1, v2 string
 }{
 	{
 		// Incorrect first
@@ -534,5 +516,40 @@ func TestWriteHeader_failed_multiple(t *testing.T) {
 		if err := WriteHeader(&b, h); err == nil {
 			t.Errorf("Expected headers \n%v: %v\n%v: %v\n to be incorrect, but it was accepted", test.k1, test.v2, test.k2, test.v2)
 		}
+	}
+}
+
+func TestHeaderFromMap(t *testing.T) {
+	m := map[string][]string{
+		"Received": []string{"from example.com by example.org", "from localhost by example.com"},
+		"To":       []string{"Taki Tachibana <taki.tachibana@example.org>"},
+		"From":     []string{"Mitsuha Miyamizu <mitsuha.miyamizu@example.com>"},
+	}
+
+	h := HeaderFromMap(m)
+
+	l := collectHeaderFields(h.Fields())
+	want := []string{
+		"From: Mitsuha Miyamizu <mitsuha.miyamizu@example.com>",
+		"Received: from example.com by example.org",
+		"Received: from localhost by example.com",
+		"To: Taki Tachibana <taki.tachibana@example.org>",
+	}
+	if !reflect.DeepEqual(l, want) {
+		t.Errorf("Fields() reported incorrect values: got \n%#v\n but want \n%#v", l, want)
+	}
+}
+
+func TestHeader_Map(t *testing.T) {
+	want := map[string][]string{
+		"Received": []string{"from example.com by example.org", "from localhost by example.com"},
+		"To":       []string{"Taki Tachibana <taki.tachibana@example.org>"},
+		"From":     []string{"Mitsuha Miyamizu <mitsuha.miyamizu@example.com>"},
+	}
+
+	h := newTestHeader()
+	m := h.Map()
+	if !reflect.DeepEqual(m, want) {
+		t.Errorf("Fields(): got \n%#v\n but want \n%#v", m, want)
 	}
 }

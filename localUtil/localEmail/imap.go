@@ -40,78 +40,55 @@ func GetImapEmailMessage(c *client.Client, number int) []ImapEmail {
 	go func() {
 		mailBoxeDone <- c.List("", "*", mailboxes)
 	}()
-	for box := range mailboxes {
-		if box.Name != "INBOX" {
-			continue
-		}
-		//fmt.Println("切换目录:", box.Name)
-		mbox, err := c.Select(box.Name, false)
-		// 选择收件箱
-		if err != nil {
-			//fmt.Println("select inbox err: ", err)
-			continue
-		}
-		if mbox.Messages == 0 {
-			continue
-		}
 
-		// 选择收取邮件的时间段
-		criteria := imap.NewSearchCriteria()
-		// 收取7天之内的邮件
-		criteria.Since = time.Now().Add(-7 * time.Hour * 24)
-		// 按条件查询邮件
-		ids, err := c.UidSearch(criteria)
-		//fmt.Println("邮件数：", len(ids))
-		if err != nil || len(ids) == 0 {
-			continue
-		}
-		seqset := new(imap.SeqSet)
-		seqset.AddNum(ids...)
-		sect := &imap.BodySectionName{Peek: true}
-
-		messages := make(chan *imap.Message, 100)
-		messageDone := make(chan error, 1)
-
-		go func() {
-			messageDone <- c.UidFetch(seqset, []imap.FetchItem{sect.FetchItem()}, messages)
-		}()
-		for msg := range messages {
-			r := msg.GetBody(sect)
-			mr, err := mail.CreateReader(r)
-			if err != nil {
-				//fmt.Println(err)
-				continue
-			}
-			header := mr.Header
-
-			tmp := ImapEmail{}
-			if date, err := header.Date(); err == nil {
-				tmp.TimeStamp = date.Unix()
-				//log.Println("邮件时间 Date:", date)
-			}
-			if from, err := header.AddressList("From"); err == nil {
-				if len(from) > 0 {
-					tmp.To = from[0].Address
-				}
-			}
-			if to, err := header.AddressList("To"); err == nil {
-				if len(to) > 0 {
-					tmp.To = to[0].Address
-				}
-			}
-			if subject, err := header.Subject(); err == nil {
-				tmp.Subject = subject
-				//log.Println("邮件主题 Subject:", subject)
-			}
-			body, _ := parseEmail(mr)
-			tmp.Body = string(body)
-			//fmt.Println("邮件正文:", string(body))
-			res = append(res, tmp)
-			//for k, _ := range fileName {
-			//	fmt.Println("收取到附件:", k)
-			//}
-		}
+	mbox, err := c.Select("INBOX", false)
+	if err != nil {
+		fmt.Println(err)
 		return res
+	}
+	if mbox.Messages == 0 {
+		return res
+	}
+
+	// 选择收取邮件的时间段
+	criteria := imap.NewSearchCriteria()
+	// 收取7天之内的邮件
+	criteria.Since = time.Now().Add(-7 * time.Hour * 24)
+	// 按条件查询邮件
+	ids, err := c.UidSearch(criteria)
+	//fmt.Println("邮件数：", len(ids))
+	if err != nil || len(ids) == 0 {
+		fmt.Println(err, len(ids))
+		return res
+	}
+	seqset := new(imap.SeqSet)
+	seqset.AddNum(ids...)
+	//sect := &imap.BodySectionName{Peek: true}
+
+	messages := make(chan *imap.Message, 100)
+	messageDone := make(chan error, 1)
+
+	go func() {
+		messageDone <- c.UidFetch(seqset, []imap.FetchItem{imap.FetchEnvelope, imap.FetchRFC822}, messages)
+	}()
+	for msg := range messages {
+		tmp := ImapEmail{}
+		tmp.TimeStamp = msg.Envelope.Date.Unix()
+		if len(msg.Envelope.From) > 0 {
+			from := msg.Envelope.From[0]
+			tmp.From = from.Address()
+		}
+		if len(msg.Envelope.To) > 0 {
+			To := msg.Envelope.To[0]
+			tmp.From = To.Address()
+		}
+		tmp.Subject = msg.Envelope.Subject
+		if body := msg.GetBody(&imap.BodySectionName{Peek: true}); body != nil {
+			bytes, _ := ioutil.ReadAll(body)
+			tmp.Body = string(bytes)
+		}
+		res = append(res, tmp)
+
 	}
 	return res
 }

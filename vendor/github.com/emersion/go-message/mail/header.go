@@ -1,10 +1,13 @@
 package mail
 
 import (
+	"crypto/rand"
+	"encoding/binary"
 	"errors"
 	"fmt"
 	"net/mail"
-	"regexp"
+	"os"
+	"strconv"
 	"strings"
 	"time"
 	"unicode/utf8"
@@ -208,14 +211,19 @@ func (p *headerParser) parseMsgID() (string, error) {
 	return left + "@" + right, nil
 }
 
-// TODO: this is a blunt way to strip any trailing CFWS (comment). A sharper
-// one would strip multiple CFWS, and only if really valid according to
-// RFC 5322.
-var commentRE = regexp.MustCompile(`[ \t]+\(.*\)$`)
-
 // A Header is a mail header.
 type Header struct {
 	message.Header
+}
+
+// HeaderFromMap creates a header from a map of header fields.
+//
+// This function is provided for interoperability with the standard library.
+// If possible, ReadHeader should be used instead to avoid loosing information.
+// The map representation looses the ordering of the fields, the capitalization
+// of the header keys, and the whitespace of the original header.
+func HeaderFromMap(m map[string][]string) Header {
+	return Header{message.HeaderFromMap(m)}
 }
 
 // AddressList parses the named header field as a list of addresses. If the
@@ -227,7 +235,7 @@ func (h *Header) AddressList(key string) ([]*Address, error) {
 	if v == "" {
 		return nil, nil
 	}
-	return parseAddressList(v)
+	return ParseAddressList(v)
 }
 
 // SetAddressList formats the named header field to the provided list of
@@ -235,15 +243,16 @@ func (h *Header) AddressList(key string) ([]*Address, error) {
 //
 // This can be used on From, Sender, Reply-To, To, Cc and Bcc header fields.
 func (h *Header) SetAddressList(key string, addrs []*Address) {
-	h.Set(key, formatAddressList(addrs))
+	if len(addrs) > 0 {
+		h.Set(key, formatAddressList(addrs))
+	} else {
+		h.Del(key)
+	}
 }
 
 // Date parses the Date header field.
 func (h *Header) Date() (time.Time, error) {
-	// TODO: remove this once https://go-review.googlesource.com/c/go/+/117596/
-	// is released (Go 1.14)
-	date := commentRE.ReplaceAllString(h.Get("Date"), "")
-	return mail.ParseDate(date)
+	return mail.ParseDate(h.Get("Date"))
 }
 
 // SetDate formats the Date header field.
@@ -297,4 +306,63 @@ func (h *Header) MsgIDList(key string) ([]string, error) {
 	}
 
 	return l, nil
+}
+
+// GenerateMessageID wraps GenerateMessageIDWithHostname and therefore uses the
+// hostname of the local machine. This is done to not break existing software.
+// Wherever possible better use GenerateMessageIDWithHostname, because the local
+// hostname of a machine tends to not be unique nor a FQDN which especially
+// brings problems with spam filters.
+func (h *Header) GenerateMessageID() error {
+	var err error
+	hostname, err := os.Hostname()
+	if err != nil {
+		return err
+	}
+	return h.GenerateMessageIDWithHostname(hostname)
+}
+
+// GenerateMessageIDWithHostname generates an RFC 2822-compliant Message-Id
+// based on the informational draft "Recommendations for generating Message
+// IDs", it takes an hostname as argument, so that software using this library
+// could use a hostname they know to be unique
+func (h *Header) GenerateMessageIDWithHostname(hostname string) error {
+	now := uint64(time.Now().UnixNano())
+
+	nonceByte := make([]byte, 8)
+	if _, err := rand.Read(nonceByte); err != nil {
+		return err
+	}
+	nonce := binary.BigEndian.Uint64(nonceByte)
+
+	msgID := fmt.Sprintf("%s.%s@%s", base36(now), base36(nonce), hostname)
+	h.SetMessageID(msgID)
+	return nil
+}
+
+func base36(input uint64) string {
+	return strings.ToUpper(strconv.FormatUint(input, 36))
+}
+
+// SetMessageID sets the Message-ID field. id is the message identifier,
+// without the angle brackets.
+func (h *Header) SetMessageID(id string) {
+	h.Set("Message-Id", "<"+id+">")
+}
+
+// SetMsgIDList formats a list of message identifiers. Message identifiers
+// don't include angle brackets.
+//
+// This can be used on In-Reply-To and References header fields.
+func (h *Header) SetMsgIDList(key string, l []string) {
+	if len(l) > 0 {
+		h.Set(key, "<"+strings.Join(l, "> <")+">")
+	} else {
+		h.Del(key)
+	}
+}
+
+// Copy creates a stand-alone copy of the header.
+func (h *Header) Copy() Header {
+	return Header{h.Header.Copy()}
 }

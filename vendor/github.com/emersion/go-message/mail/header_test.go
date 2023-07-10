@@ -1,7 +1,11 @@
 package mail_test
 
 import (
+	"bufio"
+	"bytes"
+	netmail "net/mail"
 	"reflect"
+	"strings"
 	"testing"
 	"time"
 
@@ -126,4 +130,88 @@ func TestHeader_MsgIDList(t *testing.T) {
 			t.Errorf("Failed to parse In-Reply-To %q: Header.MsgIDList() = %q, want %q", test.raw, msgIDs, test.msgIDs)
 		}
 	}
+}
+
+func TestHeader_GenerateMessageID(t *testing.T) {
+	var h mail.Header
+	if err := h.GenerateMessageID(); err != nil {
+		t.Fatalf("Header.GenerateMessageID() = %v", err)
+	}
+	if _, err := h.MessageID(); err != nil {
+		t.Errorf("Failed to parse generated Message-Id: Header.MessageID() = %v", err)
+	}
+}
+
+func TestHeader_SetMsgIDList(t *testing.T) {
+	tests := []struct {
+		raw    string
+		msgIDs []string
+	}{
+		{"", nil},
+		{"<123@asdf>", []string{"123@asdf"}},
+		{"<123@asdf> <456@asdf>", []string{"123@asdf", "456@asdf"}},
+	}
+	for _, test := range tests {
+		var h mail.Header
+		h.SetMsgIDList("In-Reply-To", test.msgIDs)
+		raw := h.Get("In-Reply-To")
+		if raw != test.raw {
+			t.Errorf("Failed to format In-Reply-To %q: Header.Get() = %q, want %q", test.msgIDs, raw, test.raw)
+		}
+	}
+}
+
+func TestHeader_CanUseNetMailAddress(t *testing.T) {
+	netfrom := []*netmail.Address{{"Mitsuha Miyamizu", "mitsuha.miyamizu@example.org"}}
+	mailfrom := []*mail.Address{{"Mitsuha Miyamizu", "mitsuha.miyamizu@example.org"}}
+
+	//sanity check that they types are identical
+	if !reflect.DeepEqual(netfrom, mailfrom) {
+		t.Error("[]*net/mail.Address differs from []*mail.Address")
+	}
+
+	//roundtrip
+	var h mail.Header
+	h.SetAddressList("From", netfrom)
+	if got, err := h.AddressList("From"); err != nil {
+		t.Error("Expected no error while parsing header address list, got:", err)
+	} else if !reflect.DeepEqual(got, netfrom) {
+		t.Errorf("Expected header address list to be %v, but got %v", netfrom, got)
+	}
+}
+
+func TestHeader_EmptyAddressList(t *testing.T) {
+	tests := []struct {
+		key   string
+		list  []*mail.Address
+		unset bool
+	}{
+		{"cc", nil, false},
+		{"to", []*mail.Address{}, false},
+		{"cc", []*mail.Address{{"Mitsuha Miyamizu", "mitsuha.miyamizu@example.org"}}, true},
+	}
+
+	for _, test := range tests {
+		var h mail.Header
+		h.SetAddressList(test.key, test.list)
+		if test.unset {
+			h.SetAddressList(test.key, nil)
+		}
+		buf := bytes.NewBuffer(nil)
+		w, err := mail.CreateSingleInlineWriter(buf, h)
+		if err != nil {
+			t.Error("Expected no error while creating inline writer, got:", err)
+		}
+		if err := w.Close(); err != nil {
+			t.Error("Expected no error while closing inline writer, got:", err)
+		}
+		scanner := bufio.NewScanner(buf)
+		for scanner.Scan() {
+			line := strings.ToLower(scanner.Text())
+			if strings.HasPrefix(line, test.key) {
+				t.Error("Expected no address list header field, but got:", scanner.Text())
+			}
+		}
+	}
+
 }
