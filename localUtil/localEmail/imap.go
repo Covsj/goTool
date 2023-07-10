@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"log"
 	"net"
 	"time"
 
@@ -35,11 +36,6 @@ func GetImapEmailMessage(c *client.Client, number int) []ImapEmail {
 	if number == 0 {
 		number = 10
 	}
-	mailboxes := make(chan *imap.MailboxInfo, number)
-	mailBoxeDone := make(chan error, 1)
-	go func() {
-		mailBoxeDone <- c.List("", "*", mailboxes)
-	}()
 
 	mbox, err := c.Select("INBOX", false)
 	if err != nil {
@@ -50,45 +46,43 @@ func GetImapEmailMessage(c *client.Client, number int) []ImapEmail {
 		return res
 	}
 
-	// 选择收取邮件的时间段
-	criteria := imap.NewSearchCriteria()
-	// 收取7天之内的邮件
-	criteria.Since = time.Now().Add(-7 * time.Hour * 24)
-	// 按条件查询邮件
-	ids, err := c.UidSearch(criteria)
-	//fmt.Println("邮件数：", len(ids))
-	if err != nil || len(ids) == 0 {
-		fmt.Println(err, len(ids))
-		return res
+	from := uint32(1)
+	to := mbox.Messages
+	if mbox.Messages > uint32(number) {
+		from = mbox.Messages - uint32(number)
 	}
-	seqset := new(imap.SeqSet)
-	seqset.AddNum(ids...)
-	//sect := &imap.BodySectionName{Peek: true}
+	for i := from; i <= to; i++ {
+		seqset := new(imap.SeqSet)
+		seqset.AddNum(i)
+		messages := make(chan *imap.Message, 1)
+		done := make(chan error, 1)
+		go func() {
+			done <- c.Fetch(seqset, []imap.FetchItem{imap.FetchEnvelope, imap.FetchRFC822}, messages)
+		}()
 
-	messages := make(chan *imap.Message, 100)
-	messageDone := make(chan error, 1)
+		for msg := range messages {
+			tmp := ImapEmail{}
+			tmp.TimeStamp = msg.Envelope.Date.Unix()
+			if len(msg.Envelope.From) > 0 {
+				from := msg.Envelope.From[0]
+				tmp.From = from.Address()
+			}
+			if len(msg.Envelope.To) > 0 {
+				To := msg.Envelope.To[0]
+				tmp.From = To.Address()
+			}
+			tmp.Subject = msg.Envelope.Subject
+			if body := msg.GetBody(&imap.BodySectionName{Peek: true}); body != nil {
+				bytes, _ := ioutil.ReadAll(body)
+				tmp.Body = string(bytes)
+			}
+			res = append(res, tmp)
+		}
 
-	go func() {
-		messageDone <- c.UidFetch(seqset, []imap.FetchItem{imap.FetchEnvelope, imap.FetchRFC822}, messages)
-	}()
-	for msg := range messages {
-		tmp := ImapEmail{}
-		tmp.TimeStamp = msg.Envelope.Date.Unix()
-		if len(msg.Envelope.From) > 0 {
-			from := msg.Envelope.From[0]
-			tmp.From = from.Address()
+		if err := <-done; err != nil {
+			log.Println("Failed to fetch message:", err)
+			continue
 		}
-		if len(msg.Envelope.To) > 0 {
-			To := msg.Envelope.To[0]
-			tmp.From = To.Address()
-		}
-		tmp.Subject = msg.Envelope.Subject
-		if body := msg.GetBody(&imap.BodySectionName{Peek: true}); body != nil {
-			bytes, _ := ioutil.ReadAll(body)
-			tmp.Body = string(bytes)
-		}
-		res = append(res, tmp)
-
 	}
 	return res
 }
