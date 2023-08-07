@@ -8,9 +8,14 @@ import (
 
 // Default configurations for HTTPCodeMonitor.
 const (
+	DefaultLatencyMultiplier  = 10.00
+	DefaultLatencyCount       = 10
+	DefaultFailureThreshold   = 0.10
+	DefaultFailureCount       = 5
 	DefaultWheelSize          = 150000
 	DefaultTimeLimit          = 300
 	DefaultRequestChannelSize = 1000
+	DefaultRequestThreshold   = 200
 )
 
 // HTTPCodeMonitor manages a set of sliding windows for monitoring HTTP requests.
@@ -158,16 +163,16 @@ func NewHTTPMonitor(configs []*MonitorConfig) error {
 	}
 	for _, config := range configs {
 		if config.LatencyMultiplier <= 0 {
-			config.LatencyMultiplier = 5.00
+			config.LatencyMultiplier = DefaultLatencyMultiplier
 		}
 		if config.LatencyCount <= 0 {
-			config.LatencyCount = 5
+			config.LatencyCount = DefaultLatencyCount
 		}
 		if config.FailureThreshold <= 0 {
-			config.FailureThreshold = 0.1
+			config.FailureThreshold = DefaultFailureThreshold
 		}
 		if config.FailureCount <= 0 {
-			config.FailureCount = 5
+			config.FailureCount = DefaultFailureCount
 		}
 		if config.TimeLimit <= 0 {
 			config.TimeLimit = DefaultTimeLimit
@@ -177,6 +182,9 @@ func NewHTTPMonitor(configs []*MonitorConfig) error {
 		}
 		if config.RequestChannelSize <= 0 {
 			config.RequestChannelSize = DefaultRequestChannelSize
+		}
+		if config.RequestThreshold <= 0 {
+			config.RequestThreshold = DefaultRequestThreshold
 		}
 		window, err := newTimeBasedWindow(config)
 		if err != nil {
