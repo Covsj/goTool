@@ -5,7 +5,7 @@ import (
 	"crypto/ecdsa"
 	"errors"
 
-	ERC20 "github.com/Covsj/goTool/localUtil/erc20"
+	ERC20 "github.com/Covsj/goTool/lib/erc20"
 	"github.com/ethereum/go-ethereum/ethclient"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"

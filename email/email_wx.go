@@ -7,11 +7,12 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Covsj/goTool/httpTool"
 	"github.com/Covsj/goTool/utils"
 	log "github.com/sirupsen/logrus"
 )
 
-var htppClient = &http.Client{}
+var httpClient = &http.Client{}
 
 type WxEmail struct {
 	Name   string `json:"name"`
@@ -135,12 +136,12 @@ func (cfg *WxEmail) SetNewWxEmail(accountLength int) string {
 	req, _ := http.NewRequest("POST", "https://"+cfg.Domain+"/api/mailbox/rand_emprefix",
 		strings.NewReader(body))
 	req.Header.Set("token", cfg.Token)
-	resp, err := htppClient.Do(req)
+	resp, err := httpClient.Do(req)
 	if err != nil {
 		log.Error("设置邮箱失败 ", err.Error())
 		return ""
 	}
-	respBody, err := utils.ReadRespBody(resp)
+	respBody, err := httpTool.ReadRespBody(resp)
 	if err != nil {
 		log.Error("设置邮箱失败 读取body失败 ", err.Error())
 		return ""
@@ -160,14 +161,14 @@ func (cfg *WxEmail) GetEmailMsgFromWx(email string) []WxEmailRespData {
 
 	request, _ := http.NewRequest("POST", "https://"+cfg.Host+"/api/mailbox/getnewest5", nil)
 	request.Header.Add("token", cfg.Token)
-	resp, err := htppClient.Do(request)
+	resp, err := httpClient.Do(request)
 	if err != nil {
 		log.Error("获取验证码失败 Do ", err.Error())
 		return result
 	}
 	defer resp.Body.Close()
 	res := wxEmailGetMsgResp{}
-	body, err := utils.ReadRespBody(resp)
+	body, err := httpTool.ReadRespBody(resp)
 	if err != nil {
 		log.Error("获取验证码失败  ReadRespBody ", err.Error())
 		return result

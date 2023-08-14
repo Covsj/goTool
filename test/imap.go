@@ -3,11 +3,11 @@ package test
 import (
 	"fmt"
 
-	"github.com/Covsj/goTool/localUtil/localEmail"
+	"github.com/Covsj/goTool/email"
 )
 
 func main() {
-	c, err := localEmail.LoginImapEmail("****", "****")
+	c, err := email.LoginImapEmail("****", "****")
 	if err != nil {
 		panic(err)
 	}
