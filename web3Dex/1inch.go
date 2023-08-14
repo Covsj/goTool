@@ -20,10 +20,10 @@ func CheckAllowance(chainId, tokenAddress, walletAddress string, url string) (st
 	}
 	url += "/approve/allowance?tokenAddress=" + tokenAddress + "&walletAddress=" + walletAddress
 	_, body, err := httpTool.CallHttp(url, "GET", "", nil)
+	//fmt.Println(resp, string(body))
 	if err != nil {
 		return "", err
 	}
-
 	var m model.CheckAllowance
 	err = json.Unmarshal(body, &m)
 	if err != nil {
