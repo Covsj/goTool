@@ -1,6 +1,6 @@
 package email
 
-type EmailResult struct {
+type Result struct {
 	From    string `json:"from"`
 	To      string `json:"to"`
 	Subject string `json:"subject"`

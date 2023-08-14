@@ -5,27 +5,27 @@ import (
 )
 
 type MyProducer struct {
-	producers map[string]*KafkaProducer
+	Producers map[string]*producer
 }
 
 func NewMyProducer(kafkaBrokers string, topics map[string]string) (*MyProducer, error) {
 	brokersList := strings.Split(kafkaBrokers, ",")
 	myProducer := &MyProducer{}
-	myProducer.producers = map[string]*KafkaProducer{}
+	myProducer.Producers = map[string]*producer{}
 	for topicIndex, topicName := range topics {
-		topic, err := NewAsyncKafkaProducer(topicName, brokersList)
+		topic, err := newAsyncKafkaProducer(topicName, brokersList)
 		if err != nil {
 			return myProducer, err
 		}
-		myProducer.producers[topicIndex] = topic
+		myProducer.Producers[topicIndex] = topic
 	}
 	return myProducer, nil
 }
 
 func (client *MyProducer) SendMessage(topicIndex string, key string, msg string) {
-	producer, exist := client.producers[topicIndex]
+	producer, exist := client.Producers[topicIndex]
 	if !exist {
 		return
 	}
-	producer.AsyncSendMessage(key, msg)
+	producer.SyncSendMessage(key, msg)
 }

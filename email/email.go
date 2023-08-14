@@ -1,5 +1,0 @@
-package email
-
-func GetEmailAccount() {
-
-}

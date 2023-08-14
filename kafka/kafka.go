@@ -7,13 +7,13 @@ import (
 	"github.com/Shopify/sarama"
 )
 
-type KafkaProducer struct {
+type producer struct {
 	asyncProducer sarama.AsyncProducer
 	topic         string
 }
 
-func NewAsyncKafkaProducer(topic string, kafkaBrokers []string) (*KafkaProducer, error) {
-	kafkaProducer := &KafkaProducer{}
+func newAsyncKafkaProducer(topic string, kafkaBrokers []string) (*producer, error) {
+	kafkaProducer := &producer{}
 	// producer config
 	config := sarama.NewConfig()
 	// 本地commit成功返回
@@ -39,8 +39,7 @@ func NewAsyncKafkaProducer(topic string, kafkaBrokers []string) (*KafkaProducer,
 	return kafkaProducer, nil
 }
 
-func (p *KafkaProducer) AsyncSendMessage(key string, value string) {
-
+func (p *producer) SyncSendMessage(key string, value string) {
 	p.asyncProducer.Input() <- &sarama.ProducerMessage{
 		Topic: p.topic,
 		Key:   sarama.StringEncoder(key),
