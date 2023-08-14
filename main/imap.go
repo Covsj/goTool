@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	c, err := localEmail.LoginImapEmail("default@covsj.top", "")
+	c, err := localEmail.LoginImapEmail("****", "****")
 	if err != nil {
 		panic(err)
 	}
