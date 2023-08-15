@@ -2,6 +2,7 @@ package monitor
 
 import (
 	"errors"
+	"math/rand"
 	"time"
 )
 
@@ -64,8 +65,13 @@ type SlidingWindow struct {
 	// The function to call when an alert is triggered.
 	AlertFunc func(path string, total int64, failRate float64, avg float64)
 
-	// The alert cooldown time.
-	AlertCooldownTime int64
+	// The alert cool down timestamp.
+	AlertCoolDownTimeByFailed  int64
+	AlertCoolDownTimeByLatency int64
+
+	LastRotationTime time.Time
+	SampleRate       int64
+	RequestCount     int64
 }
 
 // creates a new time-based window with the given configuration.
@@ -82,6 +88,7 @@ func newTimeBasedWindow(config *Config) (*SlidingWindow, error) {
 	if config.FailureCount <= 0 {
 		return nil, errors.New("invalid failure count in configuration")
 	}
+	now := time.Now()
 	base := &SlidingWindow{
 		Path:                  config.Path,
 		FailureThreshold:      config.FailureThreshold,
@@ -99,15 +106,18 @@ func newTimeBasedWindow(config *Config) (*SlidingWindow, error) {
 		RequestThreshold: config.RequestThreshold,
 		AlertFunc:        config.AlertFunc,
 		RequestChannel:   make(chan Request, config.RequestChannelSize),
+		LastRotationTime: now,
+		SampleRate:       10,
+		RequestCount:     0,
 	}
-	go base.processRequests()
-	go base.rotateWheel()
+	rand.Seed(now.Unix())
+	go base.processAndRotate()
 	return base, nil
 }
 
 // updates the count of latency exceed count.
 func (sw *SlidingWindow) updateLatencyExceedCount(req Request) {
-	if !req.IsExist {
+	if !req.IsValid {
 		return
 	}
 	if sw.TotalRequests = sw.TotalRequests - 1; sw.TotalRequests < 0 {
@@ -136,17 +146,8 @@ func (sw *SlidingWindow) isNeedExceedLatencyCount(latency, avg float64) bool {
 	return false
 }
 
-// processes requests sent through the request channel.
-func (sw *SlidingWindow) processRequests() {
-	for req := range sw.RequestChannel {
-		if req.IsExist {
-			sw.doRecord(req.Status, req.Latency)
-		}
-	}
-}
-
 // doRecord records a request in the window.
-func (sw *SlidingWindow) doRecord(status bool, latency float64) {
+func (sw *SlidingWindow) doRecord(status bool, latency float64, IsValid bool) {
 	if !status {
 		sw.FailedRequests++
 	}
@@ -158,47 +159,56 @@ func (sw *SlidingWindow) doRecord(status bool, latency float64) {
 		Status:        status,
 		Latency:       latency,
 		OldAvgLatency: avgLat,
-		IsExist:       true,
+		IsValid:       IsValid,
 	})
-	if sw.AlertOnLatency {
-		sw.updateCounterAndAlert(
-			latency > sw.LatencyThreshold && latency > avgLat*sw.LatencyMultiplier,
-			&sw.LatencyExceedCount,
-			sw.LatencyAlertThreshold,
-		)
+
+	totalRequests := sw.TotalRequests
+	now := time.Now().Unix()
+
+	if totalRequests >= sw.RequestThreshold {
+		if sw.AlertOnLatency && sw.isNeedExceedLatencyCount(latency, avgLat) {
+			sw.LatencyExceedCount++
+			if sw.AlertFunc != nil && sw.LatencyExceedCount >= sw.LatencyAlertThreshold {
+				if now-sw.AlertCoolDownTimeByLatency >= defaultCoolDown {
+					sw.AlertFunc(sw.Path, totalRequests, failRate, avgLat)
+					sw.AlertCoolDownTimeByLatency = now
+				}
+				sw.LatencyExceedCount = 0
+			}
+		} else if sw.LatencyExceedCount > 0 {
+			sw.LatencyExceedCount--
+		} else {
+			sw.LatencyExceedCount = 0
+		}
+		if failRate > sw.FailureThreshold {
+			sw.FailureExceedCount++
+			if sw.AlertFunc != nil && sw.FailureExceedCount >= sw.FailureAlertThreshold {
+				if now-sw.AlertCoolDownTimeByFailed >= defaultCoolDown {
+					sw.AlertFunc(sw.Path, totalRequests, failRate, avgLat)
+					sw.AlertCoolDownTimeByFailed = now
+				}
+				sw.FailureExceedCount = 0
+			}
+		} else if sw.FailureExceedCount > 0 {
+			sw.FailureExceedCount--
+		} else {
+			sw.FailureExceedCount = 0
+		}
 	}
-	sw.updateCounterAndAlert(
-		failRate > sw.FailureThreshold,
-		&sw.FailureExceedCount,
-		sw.FailureAlertThreshold,
-	)
 }
 
 // record records a request in the window.
 func (sw *SlidingWindow) record(status bool, latency float64) {
-	sw.RequestChannel <- Request{Status: status, Latency: latency, IsExist: true}
-}
-
-// updates the counter and potentially triggers an alert.
-func (sw *SlidingWindow) updateCounterAndAlert(condition bool, count *int64, threshold int64) {
-	if sw.RequestThreshold > 0 && sw.TotalRequests < sw.RequestThreshold {
+	// Randomly drop 20% of the requests
+	if rand.Float32() > 0.8 {
 		return
 	}
-
-	if condition {
-		*count++
-		if sw.AlertFunc != nil && *count >= threshold {
-			now := time.Now().Unix()
-			if now-sw.AlertCooldownTime >= 60*60 {
-				sw.AlertFunc(sw.Path, sw.TotalRequests, sw.failureRate(), sw.averageLatency())
-				sw.AlertCooldownTime = now
-			}
-			*count = 0
-		}
-	} else if *count > 0 {
-		*count--
-	} else {
-		*count = 0
+	req := Request{Status: status, Latency: latency, IsValid: true}
+	// Try to send to channel, if not possible, just return
+	select {
+	case sw.RequestChannel <- req:
+	default:
+		return
 	}
 }
 
@@ -218,13 +228,23 @@ func (sw *SlidingWindow) averageLatency() float64 {
 	return sw.TotalLatency / float64(sw.TotalRequests)
 }
 
-// rotateWheel rotates the wheel.
-func (sw *SlidingWindow) rotateWheel() {
-	ticker := time.NewTicker(time.Duration(sw.TimeLimit) * time.Second / time.Duration(sw.WheelSize))
-	defer ticker.Stop()
-	for range ticker.C {
-		oldReq := sw.Wheel.Data[sw.Wheel.Index]
-		sw.updateLatencyExceedCount(oldReq)
-		sw.Wheel.push(Request{})
+func (sw *SlidingWindow) processAndRotate() {
+	rotationInterval := time.Duration(sw.TimeLimit) * time.Second / time.Duration(sw.WheelSize)
+	for req := range sw.RequestChannel {
+		sw.RequestCount++
+		if req.IsValid && sw.RequestCount%sw.SampleRate == 0 {
+			sw.doRecord(req.Status, req.Latency, req.IsValid)
+		}
+		// Reset requestCount if it becomes too large
+		if sw.RequestCount >= sw.SampleRate*100 {
+			sw.RequestCount = 0
+		}
+		// Check if it's time to rotate the wheel
+		if time.Since(sw.LastRotationTime) >= rotationInterval {
+			oldReq := sw.Wheel.Data[sw.Wheel.Index]
+			sw.updateLatencyExceedCount(oldReq)
+			sw.Wheel.push(Request{IsValid: false})
+			sw.LastRotationTime = time.Now()
+		}
 	}
 }

@@ -51,5 +51,5 @@ type Request struct {
 	OldAvgLatency float64
 
 	// Whether the request exists.
-	IsExist bool
+	IsValid bool
 }
