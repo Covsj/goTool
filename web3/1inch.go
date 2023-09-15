@@ -1,30 +1,22 @@
-package web3Dex
+package web3
 
 import (
 	"encoding/json"
 
 	"github.com/Covsj/goTool/httpTool"
-	"github.com/Covsj/goTool/model"
 )
 
-func getBaseApiUrl(chainId string) string {
-	return "https://api.1inch.io/v5.0/" + chainId
-}
-func getBroadcastApiUrl(chainId string) string {
-	return "https://tx-gateway.1inch.io/v1.1/" + chainId + "/broadcast"
-}
-
-func CheckAllowance(chainId, tokenAddress, walletAddress string, url string) (string, error) {
+func Get1inchCheckAllowance(chainId, tokenAddress, walletAddress string, url string) (string, error) {
 	if url == "" {
 		url = getBaseApiUrl(chainId)
 	}
 	url += "/approve/allowance?tokenAddress=" + tokenAddress + "&walletAddress=" + walletAddress
-	_, body, err := httpTool.CallHttp(url, "GET", "", nil)
+	_, body, err := httpTool.Send(httpTool.RequestOptions{URL: url})
 	//fmt.Println(resp, string(body))
 	if err != nil {
 		return "", err
 	}
-	var m model.CheckAllowance
+	var m TokenAllowance
 	err = json.Unmarshal(body, &m)
 	if err != nil {
 		return "", err
@@ -32,20 +24,27 @@ func CheckAllowance(chainId, tokenAddress, walletAddress string, url string) (st
 	return m.Allowance, nil
 }
 
-func GetApproveTransaction(chainId, tokenAddress, amount string) (*model.Web3Call, error) {
+func Approve1inchToken(chainId, tokenAddress, amount string) (*Web3Call, error) {
 	url := getBaseApiUrl(chainId)
 	url += "/approve/transaction?tokenAddress=" + tokenAddress
 	if amount != "" {
 		url += "&amount=" + amount
 	}
-	_, body, err := httpTool.CallHttp(url, "GET", "", nil)
+	_, body, err := httpTool.Send(httpTool.RequestOptions{URL: url})
 	if err != nil {
 		return nil, err
 	}
-	m := &model.Web3Call{GasLimit: "200000"}
+	m := &Web3Call{GasLimit: "200000"}
 	err = json.Unmarshal(body, m)
 	if err != nil {
 		return nil, err
 	}
 	return m, nil
+}
+
+func getBaseApiUrl(chainId string) string {
+	return "https://api.1inch.io/v5.0/" + chainId
+}
+func getBroadcastApiUrl(chainId string) string {
+	return "https://tx-gateway.1inch.io/v1.1/" + chainId + "/broadcast"
 }

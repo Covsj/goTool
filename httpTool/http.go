@@ -6,145 +6,78 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strings"
-	"sync"
 	"time"
 )
 
-var cp *ClientPool
-var DefaultUa = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36"
-var DefaultType = "application/json"
+const (
+	DefaultUserAgent   = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36"
+	DefaultContentType = "application/json"
+)
 
-type ClientPool struct {
-	pool     *sync.Pool
-	MaxConns int
-	MaxIdle  int
-	mu       sync.Mutex
-	count    int
+var defaultClient = &http.Client{
+	Timeout:   10 * time.Second,
+	Transport: http.DefaultTransport,
 }
 
-func init() {
-	newClientPool()
+type RequestOptions struct {
+	URL     string
+	Method  string
+	Body    string
+	Headers map[string]string
 }
 
-func NewHttpRequest(url, method, body string, header map[string]string) (*http.Request, error) {
-	if method == "" {
-		method = http.MethodPost
+func NewRequest(opts RequestOptions) (*http.Request, error) {
+	if opts.Method == "" {
+		opts.Method = http.MethodGet
 	}
-	req, err := http.NewRequest(method, url, ioutil.NopCloser(bytes.NewBuffer([]byte(body))))
-	req.ContentLength = int64(len(body))
-	if len(header) > 0 {
-		for k, v := range header {
-			req.Header.Set(k, v)
-		}
-	} else {
-		req.Header.Set("User-Agent", DefaultUa)
-		req.Header.Set("Content-Type", DefaultType)
-	}
-	return req, err
-}
-
-func DoHttpRequest(req *http.Request, client *http.Client) (*http.Response, error) {
-	if client == nil {
-		client = GetClient()
-		defer ReleaseClient(client)
-	}
-
-	resp, err := client.Do(req)
+	req, err := http.NewRequest(opts.Method, opts.URL, bytes.NewBufferString(opts.Body))
 	if err != nil {
-		return resp, err
+		return nil, err
 	}
-	if resp.Body != nil {
-		bodyRaw, _ := ioutil.ReadAll(resp.Body)
-		resp.Body.Close() // copy body to release socket
-		resp.Body = ioutil.NopCloser(bytes.NewBuffer(bodyRaw))
+	for k, v := range opts.Headers {
+		req.Header.Set(k, v)
 	}
-	return resp, err
+	if req.Header.Get("User-Agent") == "" {
+		req.Header.Set("User-Agent", DefaultUserAgent)
+	}
+	if req.Header.Get("Content-Type") == "" {
+		req.Header.Set("Content-Type", DefaultContentType)
+	}
+	return req, nil
 }
 
-func ReadRespBody(resp *http.Response) (body []byte, err error) {
+func Execute(req *http.Request) (*http.Response, error) {
+	return defaultClient.Do(req)
+}
+
+func DecodeBody(resp *http.Response) ([]byte, error) {
 	defer func() {
 		if resp != nil && resp.Body != nil {
 			_ = resp.Body.Close()
 		}
 	}()
-	if strings.Index(strings.ToLower(resp.Header.Get("Content-Encoding")), "gzip") >= 0 {
+	if strings.Contains(strings.ToLower(resp.Header.Get("Content-Encoding")), "gzip") {
 		reader, err := gzip.NewReader(resp.Body)
 		if err != nil {
 			return nil, err
 		}
-		body, err := ioutil.ReadAll(reader)
-		if err != nil {
-			return body, err
-		}
-	} else {
-		body, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			return nil, err
-		}
-		return body, err
+		return ioutil.ReadAll(reader)
 	}
-	return
+	return ioutil.ReadAll(resp.Body)
 }
 
-func CallHttp(url, method, body string, header map[string]string) (*http.Response, []byte, error) {
-	req, err := NewHttpRequest(url, method, body, header)
+func Send(opts RequestOptions) (*http.Response, []byte, error) {
+	req, err := NewRequest(opts)
 	if err != nil {
 		return nil, nil, err
 	}
-	response, err := DoHttpRequest(req, nil)
-	if response == nil || err != nil {
-		return nil, nil, err
-	}
-	res, err := ReadRespBody(response)
+	response, err := Execute(req)
 	if err != nil {
 		return nil, nil, err
 	}
-	return response, res, err
-}
-
-func newClientPool() {
-	cp = &ClientPool{
-		pool: &sync.Pool{
-			New: func() interface{} {
-				client := &http.Client{
-					Timeout: time.Second * 10,
-				}
-				return client
-			},
-		},
-		MaxConns: 2000,
-		MaxIdle:  100,
-		count:    0,
+	body, err := DecodeBody(response)
+	if err != nil {
+		return response, nil, err
 	}
-}
-
-func GetClient() *http.Client {
-	cp.mu.Lock()
-	defer cp.mu.Unlock()
-
-	if cp.pool == nil {
-		return nil
-	}
-
-	client := cp.pool.Get().(*http.Client)
-	cp.count++
-	return client
-}
-
-func ReleaseClient(client *http.Client) {
-	cp.mu.Lock()
-	defer cp.mu.Unlock()
-
-	if cp.pool == nil {
-		return
-	}
-
-	if cp.count >= cp.MaxIdle {
-		client.CloseIdleConnections()
-		cp.count--
-		return
-	}
-
-	cp.pool.Put(client)
-	cp.count--
+	return response, body, nil
 }

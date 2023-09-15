@@ -1,15 +1,19 @@
 package monitor
 
-// default configurations for HTTPCodeMonitor.
+// Default configurations for HTTPCodeMonitor.
 const (
-	defaultLatencyMultiplier  = 3.00
-	defaultLatencyCount       = 5
-	defaultFailureThreshold   = 0.05
-	defaultFailureCount       = 5
-	defaultWheelSize          = 150000
-	defaultTimeLimit          = 300
-	defaultRequestChannelSize = 5000
-	defaultRequestThreshold   = 5
-	defaultLatencyMax         = 8000
-	defaultCoolDown           = 3600
+	DefaultLatencyMultiplier = 3
+	DefaultLatencyCount      = 10
+
+	DefaultFailureThreshold = 0.5
+	DefaultFailureCount     = 10
+
+	DefaultWheelSize          = 600
+	DefaultTimeLimit          = 300
+	DefaultRequestChannelSize = 10000
+	DefaultRequestThreshold   = 100
+
+	DefaultLatencyMax       = 8000
+	DefaultCoolDown         = 3600
+	DefaultLatencyThreshold = 3000
 )

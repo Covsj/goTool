@@ -1,4 +1,4 @@
-package model
+package web3
 
 type Web3Call struct {
 	Data     string `json:"data"`
@@ -8,7 +8,7 @@ type Web3Call struct {
 	Value    string `json:"value"`
 }
 
-type CheckAllowance struct {
+type TokenAllowance struct {
 	Allowance string `json:"allowance"`
 }
 

@@ -8,30 +8,33 @@ import (
 	"github.com/samuel/go-zookeeper/zk"
 )
 
-var p *MyZookeeper
+var p *ZooKeeper
 
 func init() {
-	p = NewMyZookeeper([]string{"43.138.39.90"}, time.Second*2)
+	p = InitZooKeeper([]string{"43.138.39.90:2181", "43.138.39.90:2182", "43.138.39.90:2183"}, time.Second*2)
 }
 
-func TestMyZookeeper_CreateNode(t *testing.T) {
-	fmt.Println(p.CreateNode("/test", []byte("test"), 0, zk.WorldACL(zk.PermAll)))
-}
-
-func TestMyZookeeper_GetNode(t *testing.T) {
-	res, err := p.GetNode("/test")
-	fmt.Println(string(res), err)
-}
-
-func TestMyZookeeper_Exists(t *testing.T) {
-	exists, err := p.Exists("/test")
-	fmt.Println(exists, err)
-
-	exists, err = p.Exists("/test2")
-	fmt.Println(exists, err)
-}
-
-func TestMyZookeeper_DeleteNode(t *testing.T) {
-	err := p.DeleteNode("/test", -1)
+func TestZooKeeper_Create(t *testing.T) {
+	err := p.Create("/test/001", []byte("hello2"), 0, zk.WorldACL(zk.PermAll))
 	fmt.Println(err)
+}
+
+func TestZooKeeper_Set(t *testing.T) {
+	stat, err := p.Set("/test", []byte("hello2"), -1)
+	fmt.Println(stat, err)
+}
+
+func TestGetWater(t *testing.T) {
+	w, stat, events, err := p.GetW("/test")
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("Get data", w)
+	fmt.Println("Get stat", stat)
+	for {
+		select {
+		case r, _ := <-events:
+			fmt.Println(r.Err, r.Type.String(), r.Path, r.Server, r.State.String())
+		}
+	}
 }

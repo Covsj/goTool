@@ -8,21 +8,21 @@ import (
 	"github.com/samuel/go-zookeeper/zk"
 )
 
-var myZookeeper *MyZookeeper
+var defaultZk *ZooKeeper
 
-type MyZookeeper struct {
+type ZooKeeper struct {
 	DefaultConn *zk.Conn
 }
 
-func NewMyZookeeper(servers []string, timeout time.Duration) *MyZookeeper {
+func InitZooKeeper(servers []string, timeout time.Duration) *ZooKeeper {
 	c, err := ConnectZk(servers, timeout)
 	if err != nil {
 		panic(err)
 	}
-	myZookeeper = &MyZookeeper{
+	defaultZk = &ZooKeeper{
 		DefaultConn: c,
 	}
-	return myZookeeper
+	return defaultZk
 }
 
 func ConnectZk(servers []string, timeout time.Duration) (*zk.Conn, error) {
@@ -39,80 +39,88 @@ func ConnectZk(servers []string, timeout time.Duration) (*zk.Conn, error) {
 	return c, nil
 }
 
-// CreateNode flags  0 持久节点 1 临时节点 2 有序节点
-func (p *MyZookeeper) CreateNode(nodePath string, data []byte, flags int32, acl []zk.ACL) error {
-	if err := p.checkMyZookeeper(); err != nil {
+// Create  flags  0 持久节点 1 临时节点 2 有序节点
+func (p *ZooKeeper) Create(nodePath string, data []byte, flags int32, acl []zk.ACL) error {
+	if err := p.checkZooKeeper(); err != nil {
 		return err
 	}
 	_, err := p.DefaultConn.Create(nodePath, data, flags, acl)
 	if err != nil {
-		return xerrors.Errorf("MyZookeeper CreateNode : %w", err)
+		return xerrors.Errorf("ZooKeeper CreateNode : %w", err)
 	}
 	return nil
 }
 
-func (p *MyZookeeper) GetNodeChildren(path string) ([]string, error) {
-	if err := p.checkMyZookeeper(); err != nil {
+func (p *ZooKeeper) Set(path string, data []byte, version int32) (*zk.Stat, error) {
+	return p.DefaultConn.Set(path, data, version)
+}
+
+func (p *ZooKeeper) Children(path string) ([]string, error) {
+	if err := p.checkZooKeeper(); err != nil {
 		return []string{}, err
 	}
 	res, _, err := p.DefaultConn.Children(path)
 	if err != nil {
-		return []string{}, xerrors.Errorf("MyZookeeper GetNodeChildren : %w", err)
+		return []string{}, xerrors.Errorf("ZooKeeper GetNodeChildren : %w", err)
 	}
 	return res, nil
 }
 
-func (p *MyZookeeper) GetNodeChildrenAndWatcher(path string) ([]string, <-chan zk.Event, error) {
-	if err := p.checkMyZookeeper(); err != nil {
+func (p *ZooKeeper) GetW(path string) ([]byte, *zk.Stat, <-chan zk.Event, error) {
+	return p.DefaultConn.GetW(path)
+}
+
+func (p *ZooKeeper) ChildrenW(path string) ([]string, <-chan zk.Event, error) {
+	if err := p.checkZooKeeper(); err != nil {
 		return []string{}, nil, err
 	}
 	res, _, watcher, err := p.DefaultConn.ChildrenW(path)
 	if err != nil {
-		return []string{}, nil, xerrors.Errorf("MyZookeeper GetNodeChildrenAndWatcher : %w", err)
+		return []string{}, nil, xerrors.Errorf("ZooKeeper GetNodeChildrenAndWatcher : %w", err)
 	}
 	return res, watcher, nil
 }
 
-func (p *MyZookeeper) GetNode(path string) ([]byte, error) {
-	if err := p.checkMyZookeeper(); err != nil {
+func (p *ZooKeeper) Get(path string) ([]byte, error) {
+	if err := p.checkZooKeeper(); err != nil {
 		return nil, err
 	}
 	data, _, err := p.DefaultConn.Get(path)
 	if err != nil {
-		return nil, xerrors.Errorf("MyZookeeper GetNode : %w", err)
+		return nil, xerrors.Errorf("ZooKeeper GetNode : %w", err)
 	}
 	return data, nil
 
 }
 
-func (p *MyZookeeper) DeleteNode(nodePath string, version int32) error {
-	if err := p.checkMyZookeeper(); err != nil {
+func (p *ZooKeeper) Delete(nodePath string, version int32) error {
+	if err := p.checkZooKeeper(); err != nil {
 		return err
 	}
 	err := p.DefaultConn.Delete(nodePath, version)
 	if err != nil {
-		return xerrors.Errorf("MyZookeeper DeleteNode : %w", err)
+		return xerrors.Errorf("ZooKeeper DeleteNode : %w", err)
 	}
 	return nil
 }
 
-func (p *MyZookeeper) Exists(path string) (bool, error) {
-	if err := p.checkMyZookeeper(); err != nil {
+func (p *ZooKeeper) Exists(path string) (bool, error) {
+	if err := p.checkZooKeeper(); err != nil {
 		return false, err
 	}
 	res, _, err := p.DefaultConn.Exists(path)
 	if err != nil {
-		return false, xerrors.Errorf("MyZookeeper Exists : %w", err)
+		return false, xerrors.Errorf("ZooKeeper Exists : %w", err)
 	}
 	return res, nil
 }
 
-func (p *MyZookeeper) checkMyZookeeper() error {
+func (p *ZooKeeper) checkZooKeeper() error {
 	if p == nil {
-		return xerrors.Errorf("MyZookeeper checkMyZookeeper MyZookeeper is nil")
+		return xerrors.Errorf("ZooKeeper checkZooKeeper ZooKeeper is nil")
 	}
 	if p.DefaultConn == nil {
-		return xerrors.Errorf("MyZookeeper checkMyZookeeper DefaultConn is nil")
+		return xerrors.Errorf("ZooKeeper checkZooKeeper DefaultConn is nil")
 	}
 	return nil
 }

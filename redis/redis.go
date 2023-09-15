@@ -15,7 +15,7 @@ func Ping(pool *redis.Pool) (string, error) {
 	return redis.String(conn.Do("ping"))
 }
 
-func RedisSetEx(key, value interface{}, expireTime int) (err error) {
+func SetEx(key, value interface{}, expireTime int) (err error) {
 	conn := redisPool.Get()
 	if conn == nil {
 		return errors.New("get nil redis connection")
