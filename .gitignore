@@ -4,6 +4,7 @@ goTool.iml
 release/
 ./goTool
 memo
-./main/*
+
 *.ig
 ignore/
+test/
