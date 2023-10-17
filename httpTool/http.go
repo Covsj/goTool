@@ -3,6 +3,7 @@ package httpTool
 import (
 	"bytes"
 	"compress/gzip"
+	"encoding/json"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -22,15 +23,29 @@ var defaultClient = &http.Client{
 type RequestOptions struct {
 	URL     string
 	Method  string
-	Body    string
+	Body    interface{}
 	Headers map[string]string
 }
 
 func NewRequest(opts RequestOptions) (*http.Request, error) {
 	if opts.Method == "" {
-		opts.Method = http.MethodGet
+		opts.Method = http.MethodPost
 	}
-	req, err := http.NewRequest(opts.Method, opts.URL, bytes.NewBufferString(opts.Body))
+	var body string
+	if opts.Body != nil {
+		switch opts.Body.(type) {
+		case string:
+			body = opts.Body.(string)
+		default:
+			data, err := json.Marshal(opts.Body)
+			if err != nil {
+				return nil, err
+			}
+			body = string(data)
+		}
+	}
+
+	req, err := http.NewRequest(opts.Method, opts.URL, bytes.NewBufferString(body))
 	if err != nil {
 		return nil, err
 	}
@@ -46,7 +61,10 @@ func NewRequest(opts RequestOptions) (*http.Request, error) {
 	return req, nil
 }
 
-func Execute(req *http.Request) (*http.Response, error) {
+func Execute(req *http.Request, cli *http.Client) (*http.Response, error) {
+	if cli != nil {
+		return cli.Do(req)
+	}
 	return defaultClient.Do(req)
 }
 
@@ -66,12 +84,12 @@ func DecodeBody(resp *http.Response) ([]byte, error) {
 	return ioutil.ReadAll(resp.Body)
 }
 
-func Send(opts RequestOptions) (*http.Response, []byte, error) {
+func Send(opts RequestOptions, cli *http.Client) (*http.Response, []byte, error) {
 	req, err := NewRequest(opts)
 	if err != nil {
 		return nil, nil, err
 	}
-	response, err := Execute(req)
+	response, err := Execute(req, cli)
 	if err != nil {
 		return nil, nil, err
 	}
