@@ -34,10 +34,19 @@ type Client struct {
 	httpClient *http.Client
 }
 
+var defaultClient *Client
+
+func init() {
+	defaultClient = &Client{
+		httpClient: &http.Client{},
+	}
+}
+
 func NewClient(httpClient *http.Client) *Client {
-	return &Client{
+	defaultClient = &Client{
 		httpClient: httpClient,
 	}
+	return defaultClient
 }
 
 type RequestOptions struct {
@@ -49,29 +58,30 @@ type RequestOptions struct {
 	Retries     int
 	BodyType    BodyType
 	Files       map[string][]byte // for multipart/form-data
+	HttpClient  *http.Client
 	ResponseOut interface{}
 }
 
-func (c *Client) Get(url string, out interface{}) (*http.Response, []byte, error) {
+func Get(url string, out interface{}) (*http.Response, []byte, error) {
 	opts := &RequestOptions{
 		URL:         url,
 		Method:      http.MethodGet,
 		ResponseOut: out,
 	}
-	return c.Send(opts)
+	return Send(opts)
 }
 
-func (c *Client) Post(url string, body interface{}, out interface{}) (*http.Response, []byte, error) {
+func Post(url string, body interface{}, out interface{}) (*http.Response, []byte, error) {
 	opts := &RequestOptions{
 		URL:         url,
 		Method:      http.MethodPost,
 		Body:        body,
 		ResponseOut: out,
 	}
-	return c.Send(opts)
+	return Send(opts)
 }
 
-func (c *Client) SendWithRetries(opts *RequestOptions) (*http.Response, []byte, error) {
+func SendWithRetries(opts *RequestOptions) (*http.Response, []byte, error) {
 	if opts.Retries == 0 {
 		opts.Retries = DefaultRetries
 	}
@@ -79,7 +89,7 @@ func (c *Client) SendWithRetries(opts *RequestOptions) (*http.Response, []byte, 
 	var body []byte
 	var err error
 	for i := 0; i < opts.Retries; i++ {
-		resp, body, err = c.Send(opts)
+		resp, body, err = Send(opts)
 		if err == nil {
 			return resp, body, nil
 		}
@@ -87,7 +97,7 @@ func (c *Client) SendWithRetries(opts *RequestOptions) (*http.Response, []byte, 
 	}
 	return resp, body, err
 }
-func (c *Client) NewRequest(opts *RequestOptions) (*http.Request, error) {
+func NewRequest(opts *RequestOptions) (*http.Request, error) {
 	if opts.Method == "" {
 		opts.Method = http.MethodPost
 	}
@@ -144,14 +154,14 @@ func (c *Client) NewRequest(opts *RequestOptions) (*http.Request, error) {
 	return req, nil
 }
 
-func (c *Client) Execute(req *http.Request) (*http.Response, error) {
+func Execute(req *http.Request, cli *http.Client) (*http.Response, error) {
 	if req.Header.Get("User-Agent") == "" {
 		req.Header.Set("User-Agent", DefaultUserAgent)
 	}
 	if req.Header.Get("Content-Type") == "" {
 		req.Header.Set("Content-Type", DefaultContentType)
 	}
-	resp, err := c.httpClient.Do(req)
+	resp, err := cli.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to execute request: %w", err)
 	}
@@ -161,7 +171,7 @@ func (c *Client) Execute(req *http.Request) (*http.Response, error) {
 	return resp, nil
 }
 
-func (c *Client) Decode(resp *http.Response) ([]byte, error) {
+func Decode(resp *http.Response) ([]byte, error) {
 	defer func() {
 		if resp != nil && resp.Body != nil {
 			_ = resp.Body.Close()
@@ -182,16 +192,20 @@ func (c *Client) Decode(resp *http.Response) ([]byte, error) {
 	return ioutil.ReadAll(resp.Body)
 }
 
-func (c *Client) Send(opts *RequestOptions) (*http.Response, []byte, error) {
-	req, err := c.NewRequest(opts)
+func Send(opts *RequestOptions) (*http.Response, []byte, error) {
+	req, err := NewRequest(opts)
 	if err != nil {
 		return nil, nil, err
 	}
-	resp, err := c.Execute(req)
+	cli := opts.HttpClient
+	if cli == nil {
+		cli = defaultClient.httpClient
+	}
+	resp, err := Execute(req, cli)
 	if err != nil {
 		return resp, nil, err
 	}
-	body, err := c.Decode(resp)
+	body, err := Decode(resp)
 	if err != nil {
 		return resp, nil, err
 	}

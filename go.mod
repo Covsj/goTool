@@ -12,6 +12,7 @@ require (
 	github.com/garyburd/redigo v1.6.4
 	github.com/miguelmota/go-ethereum-hdwallet v0.1.1
 	github.com/samuel/go-zookeeper v0.0.0-20201211165307-7117e9ea2414
+	github.com/sirupsen/logrus v1.2.0
 	github.com/stretchr/testify v1.8.4
 	github.com/tidwall/gjson v1.17.0
 	github.com/tyler-smith/go-bip39 v1.1.0
@@ -48,6 +49,7 @@ require (
 	github.com/jcmturner/gokrb5/v8 v8.4.3 // indirect
 	github.com/jcmturner/rpc/v2 v2.0.3 // indirect
 	github.com/klauspost/compress v1.16.6 // indirect
+	github.com/konsorten/go-windows-terminal-sequences v1.0.1 // indirect
 	github.com/pierrec/lz4/v4 v4.1.17 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/rcrowley/go-metrics v0.0.0-20201227073835-cf1acfcdf475 // indirect
@@ -60,6 +62,7 @@ require (
 	golang.org/x/exp v0.0.0-20230810033253-352e893a4cad // indirect
 	golang.org/x/net v0.12.0 // indirect
 	golang.org/x/sys v0.10.0 // indirect
+	golang.org/x/term v0.10.0 // indirect
 	golang.org/x/text v0.11.0 // indirect
 	gopkg.in/natefinch/npipe.v2 v2.0.0-20160621034901-c1b8fa8bdcce // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
