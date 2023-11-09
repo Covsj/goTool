@@ -14,28 +14,6 @@ import (
 	"time"
 )
 
-const (
-	DefaultUserAgent   = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36"
-	DefaultContentType = "application/json"
-	DefaultRetries     = 3
-)
-
-type BodyType int
-
-const (
-	BodyTypeJSON BodyType = iota
-	BodyTypeForm
-	BodyTypeMultipartForm
-)
-
-type Middleware func(*http.Request) (*http.Request, error)
-
-type Client struct {
-	httpClient *http.Client
-}
-
-var defaultClient *Client
-
 func init() {
 	defaultClient = &Client{
 		httpClient: &http.Client{},
@@ -47,19 +25,6 @@ func NewClient(httpClient *http.Client) *Client {
 		httpClient: httpClient,
 	}
 	return defaultClient
-}
-
-type RequestOptions struct {
-	URL         string
-	Method      string
-	Body        interface{}
-	Headers     map[string]string
-	Middlewares []Middleware
-	Retries     int
-	BodyType    BodyType
-	Files       map[string][]byte // for multipart/form-data
-	HttpClient  *http.Client
-	ResponseOut interface{}
 }
 
 func Get(url string, out interface{}) (*http.Response, []byte, error) {
@@ -97,6 +62,7 @@ func SendWithRetries(opts *RequestOptions) (*http.Response, []byte, error) {
 	}
 	return resp, body, err
 }
+
 func NewRequest(opts *RequestOptions) (*http.Request, error) {
 	if opts.Method == "" {
 		opts.Method = http.MethodPost
