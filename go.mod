@@ -5,7 +5,7 @@ go 1.19
 replace github.com/Shopify/sarama => github.com/IBM/sarama v1.40.1
 
 require (
-	github.com/Shopify/sarama v0.0.0-00010101000000-000000000000
+	github.com/Shopify/sarama v1.40.1
 	github.com/emersion/go-imap v1.2.1
 	github.com/emersion/go-message v0.16.0
 	github.com/ethereum/go-ethereum v1.12.2
