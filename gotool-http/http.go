@@ -182,9 +182,10 @@ func Send(opts *RequestOptions) (*http.Response, []byte, error) {
 	if err != nil {
 		return resp, nil, err
 	}
-	if opts.ResponseOut != nil {
-		if err := json.Unmarshal(body, opts.ResponseOut); err != nil {
-			return resp, body, fmt.Errorf("failed to unmarshal response body: %w", err)
+	if opts.ResponseOut != nil && len(body) != 0 {
+		if unmarshalErr := json.Unmarshal(body, opts.ResponseOut); unmarshalErr != nil {
+			// 将原始的错误信息和额外的上下文一起返回
+			return resp, body, fmt.Errorf("failed to unmarshal response body into provided struct: %w; original error: %s", unmarshalErr, err)
 		}
 	}
 	return resp, body, nil
