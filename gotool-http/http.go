@@ -67,48 +67,55 @@ func NewRequest(opts *RequestOptions) (*http.Request, error) {
 	if opts.Method == "" {
 		opts.Method = http.MethodPost
 	}
-	var bodyBuffer *bytes.Buffer
+	var bodyBuffer io.Reader // 使用 io.Reader 接口，这样可以直接传递 nil
 	var err error
 
-	switch opts.BodyType {
-	case BodyTypeForm:
-		formData := make(url.Values)
-		for key, value := range opts.Body.(map[string]string) {
-			formData.Set(key, value)
-		}
-		bodyBuffer = bytes.NewBufferString(formData.Encode())
-	case BodyTypeMultipartForm:
-		bodyBuffer = &bytes.Buffer{}
-		writer := multipart.NewWriter(bodyBuffer)
-		for fieldName, fileContent := range opts.Files {
-			var part io.Writer
-			part, err = writer.CreateFormFile(fieldName, fieldName)
+	if opts.Body != nil {
+		switch opts.BodyType {
+		case BodyTypeForm:
+			formData := make(url.Values)
+			bodyMap, ok := opts.Body.(map[string]string)
+			if !ok {
+				return nil, fmt.Errorf("body is not a map[string]string")
+			}
+			for key, value := range bodyMap {
+				formData.Set(key, value)
+			}
+			bodyBuffer = strings.NewReader(formData.Encode()) // 直接使用 strings.NewReader
+		case BodyTypeMultipartForm:
+			var buf bytes.Buffer
+			writer := multipart.NewWriter(&buf)
+			for fieldName, fileContent := range opts.Files {
+				var part io.Writer
+				part, err = writer.CreateFormFile(fieldName, fieldName)
+				if err != nil {
+					return nil, fmt.Errorf("failed to create form file for field '%s': %w", fieldName, err)
+				}
+				if _, err = part.Write(fileContent); err != nil {
+					return nil, fmt.Errorf("failed to write content for field '%s': %w", fieldName, err)
+				}
+			}
+			for key, value := range opts.Body.(map[string]string) {
+				if err = writer.WriteField(key, value); err != nil {
+					return nil, fmt.Errorf("failed to write field '%s': %w", key, err)
+				}
+			}
+			err = writer.Close()
 			if err != nil {
-				return nil, fmt.Errorf("failed to create form file for field '%s': %w", fieldName, err)
+				return nil, fmt.Errorf("failed to close multipart writer: %w", err)
 			}
-			if _, err = part.Write(fileContent); err != nil {
-				return nil, fmt.Errorf("failed to write content for field '%s': %w", fieldName, err)
+			bodyBuffer = &buf
+		default: // Default to JSON
+			var data []byte
+			data, err = json.Marshal(opts.Body)
+			if err != nil {
+				return nil, fmt.Errorf("failed to marshal body to JSON: %w", err)
 			}
+			bodyBuffer = bytes.NewReader(data)
 		}
-		for key, value := range opts.Body.(map[string]string) {
-			if err = writer.WriteField(key, value); err != nil {
-				return nil, fmt.Errorf("failed to write field '%s': %w", key, err)
-			}
-		}
-		err = writer.Close()
-		if err != nil {
-			return nil, fmt.Errorf("failed to close multipart writer: %w", err)
-		}
-	default: // Default to JSON
-		var data []byte
-		data, err = json.Marshal(opts.Body)
-		if err != nil {
-			return nil, fmt.Errorf("failed to marshal body to JSON: %w", err)
-		}
-		bodyBuffer = bytes.NewBuffer(data)
 	}
 
-	req, err := http.NewRequest(opts.Method, opts.URL, bodyBuffer)
+	req, err := http.NewRequest(opts.Method, opts.URL, bodyBuffer) // 可以直接传递 nil 或有效的 io.Reader
 	if err != nil {
 		return nil, fmt.Errorf("failed to create request: %w", err)
 	}
