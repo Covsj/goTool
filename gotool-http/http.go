@@ -10,6 +10,7 @@ import (
 	"io/ioutil"
 	"mime/multipart"
 	"net/http"
+	"net/http/httputil"
 	"strings"
 	"time"
 )
@@ -141,20 +142,14 @@ func Execute(req *http.Request, cli *http.Client) (*http.Response, error) {
 	}
 	resp, err := cli.Do(req)
 	if err != nil {
+		fmt.Println(fmt.Errorf("failed to execute request: %w", err).Error())
 		return nil, fmt.Errorf("failed to execute request: %w", err)
-	}
-	if resp.StatusCode >= 400 {
-		return resp, fmt.Errorf("received HTTP error: %s", resp.Status)
 	}
 	return resp, nil
 }
 
 func Decode(resp *http.Response) ([]byte, error) {
-	defer func() {
-		if resp != nil && resp.Body != nil {
-			_ = resp.Body.Close()
-		}
-	}()
+
 	if strings.Contains(strings.ToLower(resp.Header.Get("Content-Encoding")), "gzip") {
 		reader, err := gzip.NewReader(resp.Body)
 		if err != nil {
@@ -183,8 +178,17 @@ func Send(opts *RequestOptions) (*http.Response, []byte, error) {
 	if err != nil {
 		return resp, nil, err
 	}
+	defer func() {
+		if resp != nil && resp.Body != nil {
+			_ = resp.Body.Close()
+		}
+	}()
 	if resp.StatusCode != http.StatusOK {
-		return resp, nil, errors.New("http response not ok")
+		response, err := httputil.DumpResponse(resp, true)
+		if err != nil {
+			return resp, nil, err
+		}
+		return resp, nil, errors.New(fmt.Sprintf("http response not ok\n\n %s", string(response)))
 	}
 	body, err := Decode(resp)
 	if err != nil {
@@ -192,7 +196,6 @@ func Send(opts *RequestOptions) (*http.Response, []byte, error) {
 	}
 	if opts.ResponseOut != nil && len(body) != 0 {
 		if unmarshalErr := json.Unmarshal(body, opts.ResponseOut); unmarshalErr != nil {
-			// 将原始的错误信息和额外的上下文一起返回
 			return resp, body, fmt.Errorf("failed to unmarshal response body into provided struct: %w", unmarshalErr)
 		}
 	}
