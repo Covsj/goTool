@@ -10,7 +10,6 @@ import (
 	"io/ioutil"
 	"mime/multipart"
 	"net/http"
-	"net/url"
 	"strings"
 	"time"
 )
@@ -70,19 +69,26 @@ func NewRequest(opts *RequestOptions) (*http.Request, error) {
 	}
 	var bodyBuffer io.Reader // 使用 io.Reader 接口，这样可以直接传递 nil
 	var err error
+	var writer *multipart.Writer
 
 	if opts.Body != nil {
 		switch opts.BodyType {
 		case BodyTypeForm:
-			formData := make(url.Values)
+			payload := &bytes.Buffer{}
+			writer = multipart.NewWriter(payload)
+
 			bodyMap, ok := opts.Body.(map[string]string)
 			if !ok {
 				return nil, fmt.Errorf("body is not a map[string]string")
 			}
 			for key, value := range bodyMap {
-				formData.Set(key, value)
+				_ = writer.WriteField(key, value)
 			}
-			bodyBuffer = strings.NewReader(formData.Encode()) // 直接使用 strings.NewReader
+			err = writer.Close()
+			if err != nil {
+				return nil, fmt.Errorf("BodyTypeForm writer Close error" + err.Error())
+			}
+			bodyBuffer = payload // 直接使用 strings.NewReader
 		case BodyTypeMultipartForm:
 			var buf bytes.Buffer
 			writer := multipart.NewWriter(&buf)
@@ -107,8 +113,7 @@ func NewRequest(opts *RequestOptions) (*http.Request, error) {
 			}
 			bodyBuffer = &buf
 		default: // Default to JSON
-			var data []byte
-			data, err = json.Marshal(opts.Body)
+			data, err := json.Marshal(opts.Body)
 			if err != nil {
 				return nil, fmt.Errorf("failed to marshal body to JSON: %w", err)
 			}
@@ -124,16 +129,15 @@ func NewRequest(opts *RequestOptions) (*http.Request, error) {
 	for k, v := range opts.Headers {
 		req.Header.Set(k, v)
 	}
-
+	if writer != nil && opts.BodyType == BodyTypeForm {
+		req.Header.Set("Content-Type", writer.FormDataContentType())
+	}
 	return req, nil
 }
 
 func Execute(req *http.Request, cli *http.Client) (*http.Response, error) {
 	if req.Header.Get("User-Agent") == "" {
 		req.Header.Set("User-Agent", DefaultUserAgent)
-	}
-	if req.Header.Get("Content-Type") == "" {
-		req.Header.Set("Content-Type", DefaultContentType)
 	}
 	resp, err := cli.Do(req)
 	if err != nil {
