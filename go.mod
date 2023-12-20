@@ -10,6 +10,7 @@ require (
 	github.com/emersion/go-message v0.16.0
 	github.com/ethereum/go-ethereum v1.12.2
 	github.com/garyburd/redigo v1.6.4
+	github.com/go-sql-driver/mysql v1.7.1
 	github.com/samuel/go-zookeeper v0.0.0-20201211165307-7117e9ea2414
 	github.com/sirupsen/logrus v1.2.0
 	github.com/stretchr/testify v1.8.4

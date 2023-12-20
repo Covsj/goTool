@@ -5,8 +5,10 @@ import (
 	"crypto/ecdsa"
 	"encoding/hex"
 	"errors"
+	"fmt"
 	"math/big"
 	"strconv"
+	"strings"
 
 	ERC20 "github.com/Covsj/goTool/gotool-lib/erc20"
 	"github.com/ethereum/go-ethereum/core/types"
@@ -65,19 +67,40 @@ func CreateNewWallet() (priKey string, address string, err error) {
 	return priKey, address, nil
 }
 
-func SignText(privateKeyHex, text string) (string, error) {
-	privateKey, err := crypto.HexToECDSA(privateKeyHex)
-	if err != nil {
-		return "", err
+// EthereumMessagePrefix is the prefix added to messages signed in Ethereum
+const EthereumMessagePrefix = "\x19Ethereum Signed Message:\n"
+
+func SignText(privateKeyHex, message string) (string, error) {
+	// Ensure the private key is in the correct format
+	if strings.HasPrefix(privateKeyHex, "0x") {
+		privateKeyHex = privateKeyHex[2:]
 	}
 
-	// Hash the text
-	hash := crypto.Keccak256Hash([]byte(text))
+	// Decode the hex string to a byte slice
+	privateKeyBytes, err := hex.DecodeString(privateKeyHex)
+	if err != nil {
+		return "", fmt.Errorf("invalid private key: %v", err)
+	}
+
+	// Convert to ECDSA private key
+	privateKey, err := crypto.ToECDSA(privateKeyBytes)
+	if err != nil {
+		return "", fmt.Errorf("cannot parse private key: %v", err)
+	}
+
+	// Format the message like MetaMask does
+	prefixedMessage := fmt.Sprintf("\x19Ethereum Signed Message:\n%d%s", len(message), message)
+	hash := crypto.Keccak256Hash([]byte(prefixedMessage))
 
 	// Sign the hash
 	signature, err := crypto.Sign(hash.Bytes(), privateKey)
 	if err != nil {
 		return "", err
+	}
+
+	// Adjust the v value for Ethereum's replay-protected transaction format (EIP-155)
+	if signature[64] < 27 {
+		signature[64] += 27
 	}
 
 	return hexutil.Encode(signature), nil
@@ -108,9 +131,19 @@ func CreateTransaction(fromAddress, chainId string, to, gasLimit, gasPrice, valu
 }
 
 func SignTransactionData(privateKeyHex string, tx *types.Transaction, chainID string) (string, error) {
-	privateKey, err := crypto.HexToECDSA(privateKeyHex)
+	if strings.HasPrefix(privateKeyHex, "0x") {
+		privateKeyHex = privateKeyHex[2:]
+	}
+	// Decode the hex string to a byte slice
+	privateKeyBytes, err := hex.DecodeString(privateKeyHex)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("invalid private key: %v", err)
+	}
+
+	// Convert to ECDSA private key
+	privateKey, err := crypto.ToECDSA(privateKeyBytes)
+	if err != nil {
+		return "", fmt.Errorf("cannot parse private key: %v", err)
 	}
 
 	chainIDBigInt, _ := new(big.Int).SetString(chainID, 10)
