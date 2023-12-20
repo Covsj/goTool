@@ -65,32 +65,64 @@ func CreateNewWallet() (priKey string, address string, err error) {
 	return priKey, address, nil
 }
 
-func SignerTransaction(priKey, fromAddress, chainId string, to, gasPrice, gasLimit, value, data string) (string, error) {
-	client := GetRpcClientByChainId(chainId)
-	privateKey, err := crypto.HexToECDSA(priKey)
+func SignText(privateKeyHex, text string) (string, error) {
+	privateKey, err := crypto.HexToECDSA(privateKeyHex)
 	if err != nil {
 		return "", err
 	}
+
+	// Hash the text
+	hash := crypto.Keccak256Hash([]byte(text))
+
+	// Sign the hash
+	signature, err := crypto.Sign(hash.Bytes(), privateKey)
+	if err != nil {
+		return "", err
+	}
+
+	return hexutil.Encode(signature), nil
+}
+
+func CreateTransaction(fromAddress, chainId string, to, gasLimit, gasPrice, value, data string) (*types.Transaction, error) {
+	client := GetRpcClientByChainId(chainId)
 	nonce, err := client.PendingNonceAt(context.Background(), common.HexToAddress(fromAddress))
 	if err != nil {
+		return nil, err
+	}
+	//    gasPrice := "20000000000" // 例如：20 Gwei
+	//    gasLimit := "21000"       // 例如：21000
+	//    value := "1000000000000000000" // 例如：1 ETH
+	if gasLimit == "" {
+		gasLimit = "21000"
+	}
+	if gasPrice == "" {
+		gasPrice = "20000000000"
+	}
+	valueBigInt, _ := new(big.Int).SetString(value, 10)
+	gasLimitUint64, _ := strconv.ParseUint(gasLimit, 10, 64)
+	gasPriceBigInt, _ := new(big.Int).SetString(gasPrice, 10)
+
+	tx := types.NewTransaction(nonce, common.HexToAddress(to), valueBigInt, gasLimitUint64, gasPriceBigInt, []byte(data))
+
+	return tx, nil
+}
+
+func SignTransactionData(privateKeyHex string, tx *types.Transaction, chainID string) (string, error) {
+	privateKey, err := crypto.HexToECDSA(privateKeyHex)
+	if err != nil {
 		return "", err
 	}
-	v, _ := new(big.Int).SetString(value, 10)
-	limit, _ := strconv.ParseUint(gasLimit, 10, 64)
-	price, _ := new(big.Int).SetString(gasPrice, 10)
 
-	tx := types.NewTransaction(nonce, common.HexToAddress(to),
-		v, limit, price, []byte(data))
-	chain, _ := new(big.Int).SetString(chainId, 10)
-	signedTx, err := types.SignTx(tx, types.NewEIP155Signer(chain), privateKey)
-	if err != nil {
-		return "", nil
-	}
-
-	b, err := rlp.EncodeToBytes(signedTx)
+	chainIDBigInt, _ := new(big.Int).SetString(chainID, 10)
+	signedTx, err := types.SignTx(tx, types.NewEIP155Signer(chainIDBigInt), privateKey)
 	if err != nil {
 		return "", err
 	}
-	return hex.EncodeToString(b), nil
 
+	rlpEncodedTx, err := rlp.EncodeToBytes(signedTx)
+	if err != nil {
+		return "", err
+	}
+
+	return hex.EncodeToString(rlpEncodedTx), nil
 }
