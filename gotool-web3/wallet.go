@@ -106,9 +106,12 @@ func SignText(privateKeyHex, message string) (string, error) {
 	return hexutil.Encode(signature), nil
 }
 
+func GetAddressNonce(fromAddress, chainId string) (uint64, error) {
+	return GetRpcClientByChainId(chainId).PendingNonceAt(context.Background(), common.HexToAddress(fromAddress))
+}
+
 func CreateTransaction(fromAddress, chainId string, to, gasLimit, gasPrice, value, data string) (*types.Transaction, error) {
-	client := GetRpcClientByChainId(chainId)
-	nonce, err := client.PendingNonceAt(context.Background(), common.HexToAddress(fromAddress))
+	nonce, err := GetAddressNonce(fromAddress, chainId)
 	if err != nil {
 		return nil, err
 	}
