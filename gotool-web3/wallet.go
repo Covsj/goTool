@@ -4,7 +4,6 @@ import (
 	"context"
 	"crypto/ecdsa"
 	"crypto/sha256"
-	"encoding/hex"
 	"errors"
 	"fmt"
 	"strings"
@@ -84,19 +83,19 @@ func CalculateLastWord(mnemonicWords []string) (string, error) {
 	var binaryString string
 
 	for _, word := range mnemonicWords {
-		index, found := findIndex(wordList[:], word)
+		index, found := findIndex(wordList, word)
 		if !found {
 			return "", fmt.Errorf("word '%s' not found in BIP-39 word list", word)
 		}
 		binaryString += fmt.Sprintf("%011b", index)
 	}
-
-	hash := sha256.Sum256([]byte(hex.EncodeToString([]byte(binaryString))))
-	checksum := fmt.Sprintf("%b", hash)[:len(mnemonicWords)]
-
+	hash := sha256.Sum256(binaryStringToBytes(binaryString))
+	checksum := fmt.Sprintf("%08b", hash[0])[:4]
 	fullBinaryString := binaryString + checksum
-
-	lastWordIndex, _ := binaryToDecimal(fullBinaryString[len(fullBinaryString)-11:])
+	lastWordIndex, err := binaryToDecimal(fullBinaryString[len(fullBinaryString)-11:])
+	if err != nil {
+		return "", err
+	}
 	return wordList[lastWordIndex], nil
 }
 
