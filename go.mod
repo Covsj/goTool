@@ -8,9 +8,11 @@ require (
 	github.com/ethereum/go-ethereum v1.13.7
 	github.com/garyburd/redigo v1.6.4
 	github.com/go-sql-driver/mysql v1.7.1
+	github.com/miguelmota/go-ethereum-hdwallet v0.1.2
 	github.com/samuel/go-zookeeper v0.0.0-20201211165307-7117e9ea2414
 	github.com/sirupsen/logrus v1.9.3
 	github.com/stretchr/testify v1.8.4
+	github.com/tyler-smith/go-bip39 v1.1.0
 	go.uber.org/goleak v1.3.0
 	golang.org/x/xerrors v0.0.0-20231012003039-104605ab7028
 )
@@ -19,7 +21,10 @@ require (
 	github.com/Microsoft/go-winio v0.6.1 // indirect
 	github.com/StackExchange/wmi v1.2.1 // indirect
 	github.com/bits-and-blooms/bitset v1.10.0 // indirect
+	github.com/btcsuite/btcd v0.22.1 // indirect
 	github.com/btcsuite/btcd/btcec/v2 v2.2.0 // indirect
+	github.com/btcsuite/btcd/chaincfg/chainhash v1.0.1 // indirect
+	github.com/btcsuite/btcutil v1.0.3-0.20201208143702-a53e38424cce // indirect
 	github.com/consensys/bavard v0.1.13 // indirect
 	github.com/consensys/gnark-crypto v0.12.1 // indirect
 	github.com/crate-crypto/go-kzg-4844 v0.7.0 // indirect
