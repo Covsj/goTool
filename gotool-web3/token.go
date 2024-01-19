@@ -3,6 +3,7 @@ package gotool_web3
 import (
 	"context"
 
+	ERC20 "github.com/Covsj/goTool/gotool-lib/erc20"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
