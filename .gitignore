@@ -1,0 +1,11 @@
+.idea/
+*.iml
+goTool.iml
+release/
+./goTool
+memo
+
+*.ig
+ignore/
+test/
+cmd/
