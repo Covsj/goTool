@@ -9,3 +9,4 @@ memo
 ignore/
 test/
 cmd/
+.DS_Store
