@@ -5,11 +5,7 @@ import (
 	"time"
 )
 
-type Handler struct {
-	Token string `json:"token"`
-}
-
-func (c *CapSolver) Solve(task map[string]any) (*CapSolverResponse, error) {
+func (c *CapSolver) Solve(task map[string]interface{}) (*CapSolverResponse, error) {
 	capRes, err := request(CreateTaskUri, &capSolverRequest{Task: &task, ClientKey: c.getApiKey()})
 	if err != nil {
 		return nil, err
