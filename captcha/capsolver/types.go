@@ -46,10 +46,10 @@ type EnterPrisePayload struct {
 	S      string `json:"s,omitempty"`
 	Rqdata string `json:"rqdata,omitempty"`
 }
-type cookies struct {
-	Cookies []cookieItem `json:"cookies,omitempty"`
+type Cookies struct {
+	Cookies []CookieItem `json:"cookies,omitempty"`
 }
-type cookieItem struct {
+type CookieItem struct {
 	Value string `json:"value,omitempty"`
 	Name  string `json:"name,omitempty"`
 }
@@ -63,7 +63,7 @@ type Task struct {
 	IsInvisible               bool               `json:"isInvisible,omitempty"`
 	ApiDomain                 string             `json:"apiDomain,omitempty"`
 	UserAgent                 string             `json:"userAgent,omitempty"`
-	Cookies                   *cookies           `json:"cookies,omitempty"`
+	Cookies                   *Cookies           `json:"cookies,omitempty"`
 	Module                    string             `json:"module,omitempty"`
 	Body                      string             `json:"body,omitempty"`
 	Question                  string             `json:"question,omitempty"`
