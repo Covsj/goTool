@@ -12,7 +12,7 @@ var capSolver = &CapSolver{ApiKey: ""}
 
 func TestTask(t *testing.T) {
 	s, err := capSolver.Solve(
-		map[string]interface{}{
+  map[string]interface{}{
 			"type":       "ReCaptchaV2TaskProxyLess",
 			"websiteURL": "https://www.google.com/recaptcha/api2/demo",
 			"websiteKey": "6Le-wvkSAAAAAPBMRTvw0Q4Muexq9bi0DJwx_mJ-",
@@ -25,7 +25,7 @@ func TestTask(t *testing.T) {
 
 func TestFunCaptcha(t *testing.T) {
 	s, err := capSolver.Solve(
-		map[string]interface{}{
+  map[string]interface{}{
 			"type":             "FunCaptchaTask",
 			"websiteURL":       "",
 			"websitePublicKey": "",
@@ -40,7 +40,7 @@ func TestFunCaptcha(t *testing.T) {
 }
 func TestHCaptcha(t *testing.T) {
 	s, err := capSolver.Solve(
-		map[string]interface{}{
+  map[string]interface{}{
 			"type":       "HCaptchaTurboTask",
 			"websiteURL": "https://www.discord.com",
 			"websiteKey": "4c672d35-0701-42b2-88c3-78380b0db560",
@@ -55,7 +55,7 @@ func TestHCaptcha(t *testing.T) {
 
 func TestGeeTest(t *testing.T) {
 	s, err := capSolver.Solve(
-		map[string]interface{}{
+  map[string]interface{}{
 			"type": "GeeTestTaskProxyLess",
 		})
 	if err != nil {
@@ -66,7 +66,7 @@ func TestGeeTest(t *testing.T) {
 
 func TestDataDom(t *testing.T) {
 	s, err := capSolver.Solve(
-		map[string]interface{}{
+  map[string]interface{}{
 			"type": "DataDomeSliderTask",
 		})
 	if err != nil {
@@ -77,7 +77,7 @@ func TestDataDom(t *testing.T) {
 
 func TestAntiCloudflareTask(t *testing.T) {
 	s, err := capSolver.Solve(
-		map[string]interface{}{
+  map[string]interface{}{
 			"type": "AntiCloudflareTask",
 		})
 	if err != nil {
@@ -88,7 +88,7 @@ func TestAntiCloudflareTask(t *testing.T) {
 
 func TestAntiKasadaTask(t *testing.T) {
 	s, err := capSolver.Solve(
-		map[string]interface{}{
+  map[string]interface{}{
 			"type": "AntiKasadaTask",
 		})
 	if err != nil {
@@ -99,7 +99,7 @@ func TestAntiKasadaTask(t *testing.T) {
 
 func TestAntiAkamaiBMPTask(t *testing.T) {
 	s, err := capSolver.Solve(
-		map[string]interface{}{
+  map[string]interface{}{
 			"type": "AntiAkamaiBMPTask",
 		})
 	if err != nil {
@@ -122,7 +122,7 @@ func TestRecognition(t *testing.T) {
 		panic(err)
 	}
 	s, err := capSolver.Solve(
-		map[string]interface{}{"type": "ImageToTextTask",
+  map[string]interface{}{
 			"module": "queueit",
 			"body":   base64.StdEncoding.EncodeToString(b),
 		})
@@ -138,7 +138,7 @@ func TestHCaptchaClassfication(t *testing.T) {
 		panic(err)
 	}
 	s, err := capSolver.Solve(
-		map[string]interface{}{
+  map[string]interface{}{
 			"type":     "HCaptchaClassification",
 			"question": "Please click each image containing a truck",
 			"queries": []string{
