@@ -6,8 +6,8 @@ import (
 	"github.com/Covsj/goTool/http"
 )
 
-func request(uri string, solverRequest *capSolverRequest) (*CapSolverResponse, error) {
-	capResponse := &CapSolverResponse{}
+func request(uri string, solverRequest *Request) (*Response, error) {
+	capResponse := &Response{}
 	_, _, err := http.SendWithRetries(&http.RequestOptions{
 		Retries:     2,
 		URL:         fmt.Sprintf("%s%s", ApiHost, uri),

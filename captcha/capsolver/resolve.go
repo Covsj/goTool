@@ -5,8 +5,8 @@ import (
 	"time"
 )
 
-func (c *CapSolver) Solve(task map[string]interface{}) (*CapSolverResponse, error) {
-	capRes, err := request(CreateTaskUri, &capSolverRequest{Task: &task, ClientKey: c.getApiKey()})
+func (c *CapSolver) Solve(task map[string]interface{}) (*Response, error) {
+	capRes, err := request(CreateTaskUri, &Request{Task: &task, ClientKey: c.getApiKey()})
 	if err != nil {
 		return nil, err
 	}
@@ -17,7 +17,7 @@ func (c *CapSolver) Solve(task map[string]interface{}) (*CapSolverResponse, erro
 		return capRes, nil
 	}
 	for i := 0; i < TaskTimeout; i++ {
-		capRes, err = request(GetTaskUri, &capSolverRequest{ClientKey: c.getApiKey(), TaskId: capRes.TaskId})
+		capRes, err = request(GetTaskUri, &Request{ClientKey: c.getApiKey(), TaskId: capRes.TaskId})
 		time.Sleep(time.Second * 1)
 		if err != nil {
 			return nil, err
@@ -32,8 +32,8 @@ func (c *CapSolver) Solve(task map[string]interface{}) (*CapSolverResponse, erro
 	return capRes, err
 }
 
-func (c *CapSolver) Balance() (*CapSolverResponse, error) {
-	capRes, err := request(BalanceUri, &capSolverRequest{ClientKey: c.getApiKey()})
+func (c *CapSolver) Balance() (*Response, error) {
+	capRes, err := request(BalanceUri, &Request{ClientKey: c.getApiKey()})
 	if err != nil {
 		return nil, err
 	}

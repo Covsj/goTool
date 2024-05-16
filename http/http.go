@@ -183,13 +183,15 @@ func Send(opts *RequestOptions) (*http.Response, []byte, error) {
 			_ = resp.Body.Close()
 		}
 	}()
-	if resp.StatusCode != http.StatusOK {
+
+	if opts.CheckStatus && resp.StatusCode != http.StatusOK {
 		response, err := httputil.DumpResponse(resp, true)
 		if err != nil {
 			return resp, nil, err
 		}
-		return resp, nil, errors.New(fmt.Sprintf("http response not ok\n\n %s", string(response)))
+		return resp, nil, errors.New(fmt.Sprintf("http response not ok, %s", string(response)))
 	}
+
 	body, err := Decode(resp)
 	if err != nil {
 		return resp, nil, err
