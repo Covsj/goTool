@@ -4,7 +4,7 @@ type CapSolver struct {
 	ApiKey string
 }
 
-type solution struct {
+type Solution struct {
 	Object             []bool    `json:"objects,omitempty"`
 	Box                []float32 `json:"box,omitempty"`
 	ImageSizes         []int32   `json:"imageSize,omitempty"`
@@ -25,24 +25,24 @@ type solution struct {
 	Type               string    `json:"type,omitempty"`
 }
 
-type CapSolverResponse struct {
+type Response struct {
 	ErrorId          int32     `json:"errorId"`
 	ErrorCode        string    `json:"errorCode"`
 	ErrorDescription string    `json:"errorDescription,omitempty"`
 	Status           string    `json:"status,omitempty"`
-	Solution         *solution `json:"solution,omitempty"`
+	Solution         *Solution `json:"solution,omitempty"`
 	TaskId           string    `json:"taskId,omitempty"`
 	Balance          float32   `json:"balance,omitempty"`
 	Packages         []string  `json:"packages,omitempty"`
 }
 
-type capSolverRequest struct {
+type Request struct {
 	ClientKey string                  `json:"ClientKey"`
 	Task      *map[string]interface{} `json:"task,omitempty"`
 	TaskId    string                  `json:"taskId,omitempty"`
 }
 
-type enterPrisePayload struct {
+type EnterPrisePayload struct {
 	S      string `json:"s,omitempty"`
 	Rqdata string `json:"rqdata,omitempty"`
 }
@@ -54,12 +54,12 @@ type cookieItem struct {
 	Name  string `json:"name,omitempty"`
 }
 
-type CapSolverTask struct {
+type Task struct {
 	Type                      string             `json:"type"`
 	WebsiteURL                string             `json:"websiteURL,omitempty"`
 	WebsiteKey                string             `json:"websiteKey,omitempty"`
 	Proxy                     string             `json:"proxy,omitempty"`
-	EnterPrisePayload         *enterPrisePayload `json:"enterprisePayload,omitempty"`
+	EnterPrisePayload         *EnterPrisePayload `json:"enterprisePayload,omitempty"`
 	IsInvisible               bool               `json:"isInvisible,omitempty"`
 	ApiDomain                 string             `json:"apiDomain,omitempty"`
 	UserAgent                 string             `json:"userAgent,omitempty"`

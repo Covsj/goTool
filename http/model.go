@@ -23,4 +23,5 @@ type RequestOptions struct {
 	Files       map[string][]byte // for multipart/form-data
 	HttpClient  *http.Client
 	ResponseOut interface{}
+	CheckStatus bool
 }
