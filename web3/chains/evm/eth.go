@@ -18,7 +18,7 @@ import (
 	"github.com/ethereum/go-ethereum/rpc"
 )
 
-type ArbHandler struct {
+type EthHandler struct {
 	privateKey string
 	mnemonic   string
 	Address    common.Address
@@ -27,22 +27,22 @@ type ArbHandler struct {
 	Rpc        string
 }
 
-func NewArbHandler(rpc string, privateKey, mnemonic string) (*ArbHandler, error) {
+func NewEthHandler(rpc string, privateKey, mnemonic string) (*EthHandler, error) {
 	privateKey = strings.TrimPrefix(privateKey, "0x")
 
 	if rpc == "" {
-		rpc = RPcArb
+		rpc = RpcEth
 	}
-
-	p := &ArbHandler{
+	p := &EthHandler{
 		Rpc:        rpc,
 		privateKey: privateKey,
 		mnemonic:   mnemonic,
 	}
 	if privateKey != "" {
+		p.privateKey = privateKey
 		address, err := GetAddressByPrivateKey(privateKey)
 		if err != nil {
-			log.Error("初始化ArbHandler获取地址失败", "error", err.Error())
+			log.Error("初始化EthHandler获取地址失败", "error", err.Error())
 			return nil, err
 		} else {
 			p.Address = common.HexToAddress(address)
@@ -50,7 +50,7 @@ func NewArbHandler(rpc string, privateKey, mnemonic string) (*ArbHandler, error)
 	} else if mnemonic != "" {
 		address, priKey, err := GetAddressByMnemonic(mnemonic)
 		if err != nil {
-			log.Error("初始化ArbHandler获取地址失败", "error", err.Error())
+			log.Error("初始化EthHandler获取地址失败", "error", err.Error())
 			return nil, err
 		} else {
 			p.Address = common.HexToAddress(address)
@@ -59,7 +59,7 @@ func NewArbHandler(rpc string, privateKey, mnemonic string) (*ArbHandler, error)
 	} else {
 		mnemonic, key, address, err := CreateNewWalletByMnemonic()
 		if err != nil {
-			log.Error("初始化ArbHandler随机生成钱包账户失败", "error", err.Error())
+			log.Error("初始化EthHandler随机生成钱包账户失败", "error", err.Error())
 			return nil, err
 		} else {
 			p.Address = common.HexToAddress(address)
@@ -70,45 +70,45 @@ func NewArbHandler(rpc string, privateKey, mnemonic string) (*ArbHandler, error)
 
 	client, rpcClient, err := CreateClient(rpc)
 	if err != nil {
-		log.Error("初始化ArbHandler获取客户端失败", "error", err.Error())
+		log.Error("初始化EthHandler获取客户端失败", "error", err.Error())
 		return nil, err
 	}
 	p.rpcClient = rpcClient
 	p.client = client
-	return p, nil
+	return p, err
 }
 
-func (h *ArbHandler) ChainId() int64 {
+func (h *EthHandler) ChainId() int64 {
 	id, err := h.Client().ChainID(context.Background())
 	if err != nil {
-		return 42161
+		return 1
 	}
 	return id.Int64()
 }
 
-func (h *ArbHandler) DefaultGasLimit() uint64 {
+func (h *EthHandler) GasLimit() uint64 {
 	return 21_0000
 }
 
-func (h *ArbHandler) ChainName() string {
-	return "ARBITRUM_ONE"
+func (h *EthHandler) ChainName() string {
+	return "ETH"
 }
 
-func (h *ArbHandler) Client() *ethclient.Client {
+func (h *EthHandler) Client() *ethclient.Client {
 	return h.client
 }
 
-func (h *ArbHandler) RpcClient() *rpc.Client {
+func (h *EthHandler) RpcClient() *rpc.Client {
 	return h.rpcClient
 }
 
-// GetEthBalance 获取以太币余额
-func (h *ArbHandler) GetEthBalance(address common.Address) (*big.Int, error) {
+// NativeBalance 获取以太币余额
+func (h *EthHandler) NativeBalance(address common.Address) (*big.Int, error) {
 	return h.Client().BalanceAt(context.Background(), address, nil)
 }
 
-// GetTokenBalance 获取代币余额
-func (h *ArbHandler) GetTokenBalance(tokenAddress common.Address, ownerAddress common.Address) (*big.Int, error) {
+// TokenBalance 获取代币余额
+func (h *EthHandler) TokenBalance(tokenAddress common.Address, ownerAddress common.Address) (*big.Int, error) {
 	instance, err := ERC20.NewUtils(tokenAddress, h.Client())
 	if err != nil {
 		return nil, err
@@ -117,7 +117,7 @@ func (h *ArbHandler) GetTokenBalance(tokenAddress common.Address, ownerAddress c
 }
 
 // SendTransaction 发送交易
-func (h *ArbHandler) SendTransaction(toAddress common.Address,
+func (h *EthHandler) SendTransaction(toAddress common.Address,
 	amount *big.Int, gasLimit uint64, data []byte, result interface{}) (common.Hash, error) {
 	privateKey, err := crypto.HexToECDSA(h.privateKey)
 	if err != nil {
@@ -135,7 +135,7 @@ func (h *ArbHandler) SendTransaction(toAddress common.Address,
 	}
 
 	if gasLimit <= 0 {
-		gasLimit = h.DefaultGasLimit()
+		gasLimit = h.GasLimit()
 	}
 
 	tx := types.NewTransaction(nonce, toAddress, amount, gasLimit, gasPrice, data)
@@ -157,14 +157,12 @@ func (h *ArbHandler) SendTransaction(toAddress common.Address,
 }
 
 // SendEth 发送以太币
-func (h *ArbHandler) SendEth(toAddress common.Address, amount *big.Int, gasLimit uint64) (common.Hash, error) {
+func (h *EthHandler) SendEth(toAddress common.Address, amount *big.Int, gasLimit uint64) (common.Hash, error) {
 	return h.SendTransaction(toAddress, amount, gasLimit, nil, nil)
 }
 
 // SendToken 发送代币
-func (h *ArbHandler) SendToken(tokenAddress common.Address,
-	toAddress common.Address, amount *big.Int) (common.Hash, error) {
-
+func (h *EthHandler) SendToken(tokenAddress common.Address, toAddress common.Address, amount *big.Int) (common.Hash, error) {
 	privateKey, err := crypto.HexToECDSA(h.privateKey)
 	if err != nil {
 		return common.Hash{}, err
@@ -184,7 +182,7 @@ func (h *ArbHandler) SendToken(tokenAddress common.Address,
 	return tx.Hash(), nil
 }
 
-func (h *ArbHandler) GetTokenDecimals(tokenAddress common.Address) (uint8, error) {
+func (h *EthHandler) TokenDecimals(tokenAddress common.Address) (uint8, error) {
 	opts := &bind.CallOpts{}
 	token, err := ERC20.NewUtils(tokenAddress, h.Client())
 	if err != nil {
@@ -197,7 +195,7 @@ func (h *ArbHandler) GetTokenDecimals(tokenAddress common.Address) (uint8, error
 	return decimals, nil
 }
 
-func (h *ArbHandler) CallContract(contractAddress common.Address, abiStr,
+func (h *EthHandler) CallContract(contractAddress common.Address, abiStr,
 	method string, results interface{}, amount *big.Int, params ...interface{}) (common.Hash, error) {
 
 	// 加载合约ABI
@@ -214,7 +212,7 @@ func (h *ArbHandler) CallContract(contractAddress common.Address, abiStr,
 	return h.SendTransaction(contractAddress, amount, 0, txData, results)
 }
 
-func (h *ArbHandler) QueryTransactionStatus(txHash common.Hash) (isPending bool, status bool, err error) {
+func (h *EthHandler) QueryTransactionStatus(txHash common.Hash) (isPending bool, status bool, err error) {
 	// Use Ethereum client to get pending transaction
 	tx, isPending, err := h.Client().TransactionByHash(context.Background(), txHash)
 	if err != nil {
