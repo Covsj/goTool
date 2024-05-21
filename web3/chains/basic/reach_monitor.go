@@ -15,17 +15,17 @@ type RpcLatency struct {
 	Height  int64  `json:"height"`
 }
 
-// You can customize the test latency method of rpc
+// RpcReachability You can customize the test latency method of rpc
 type RpcReachability interface {
 	LatencyOf(rpc string, timeout int64) (l *RpcLatency, err error)
 }
 
 type ReachMonitorDelegate interface {
-	// A node has received a response
+	// ReachabilityDidReceiveNode A node has received a response
 	ReachabilityDidReceiveNode(monitor *ReachMonitor, latency *RpcLatency)
-	// A node request failed
+	// ReachabilityDidFailNode A node request failed
 	ReachabilityDidFailNode(monitor *ReachMonitor, latency *RpcLatency)
-	// The entire network connection test task is over
+	// ReachabilityDidFinish The entire network connection test task is over
 	// @param overview Overview of the results of all connection tests
 	ReachabilityDidFinish(monitor *ReachMonitor, overview string)
 }
@@ -43,7 +43,7 @@ type ReachMonitor struct {
 	stoped bool
 }
 
-// You need to pass in different objects to get the latency and block height of different chains.
+// NewReachMonitorWithReachability You need to pass in different objects to get the latency and block height of different chains.
 // let reachability = eth.RpcReachability()
 // let reachability = polka.RpcReachability()
 // let reachability = sui.RestReachability()

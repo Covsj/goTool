@@ -5,7 +5,6 @@ import (
 	"unicode"
 )
 
-// IsHexString
 func IsHexString(str string) (valid bool, length int) {
 	if strings.HasPrefix(str, "0x") || strings.HasPrefix(str, "0X") {
 		str = str[2:] // remove 0x prefix

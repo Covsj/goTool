@@ -29,7 +29,7 @@ type Aniable interface {
 	//	}
 }
 
-// 如果需要自定义类型支持 Any, 需要遵循协议 Aniable
+// Any 如果需要自定义类型支持 Any, 需要遵循协议 Aniable
 type Any struct {
 	Value any
 }
@@ -38,7 +38,7 @@ func NewAny() *Any {
 	return &Any{}
 }
 
-// `Any` only support Marshal
+// MarshalJSON `Any` only support Marshal
 func (a Any) MarshalJSON() ([]byte, error) {
 	return json.Marshal(a.Value)
 }

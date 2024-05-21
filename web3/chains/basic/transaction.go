@@ -25,7 +25,7 @@ const (
 	TransactionStatusFailure TransactionStatus = 3
 )
 
-// Transaction details that can be fetched from the chain
+// TransactionDetail Transaction details that can be fetched from the chain
 type TransactionDetail struct {
 	// hash string on chain
 	HashString string
@@ -52,12 +52,12 @@ type TransactionDetail struct {
 	TokenName string
 }
 
-// Check the `CIDNumber` is not empty.
+// IsCIDTransfer Check the `CIDNumber` is not empty.
 func (d *TransactionDetail) IsCIDTransfer() bool {
 	return strings.TrimSpace(d.CIDNumber) != ""
 }
 
-// Check the `TokenName` is not empty.
+// IsNFTTransfer Check the `TokenName` is not empty.
 func (d *TransactionDetail) IsNFTTransfer() bool {
 	return strings.TrimSpace(d.TokenName) != ""
 }
