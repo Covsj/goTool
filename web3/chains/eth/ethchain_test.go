@@ -41,7 +41,7 @@ const (
 )
 
 func TestEstimateGasLimit(t *testing.T) {
-	var ethChain, _ = NewEthChain().CreateRemote(rpcs.binanceTest.url)
+	var ethChain, _ = NewEthChain().CreateRemote(rpcs.binanceProd.url)
 	gasprice := "10"
 	amount := "1"
 	gasLimit, err := ethChain.EstimateGasLimit(transferFromAddress, transferToAddress, gasprice, amount)

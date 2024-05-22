@@ -44,11 +44,6 @@ func TestChain_SuggestGasPriceEIP1559(t *testing.T) {
 			checker: "https://etherscan.io/gastracker",
 		},
 		{
-			name:    "rinkeby gas price",
-			rpcInfo: rpcs.rinkeby,
-			checker: "",
-		},
-		{
 			name:    "binance prod not support eip1559 yet",
 			rpcInfo: rpcs.binanceProd,
 			wantErr: true,

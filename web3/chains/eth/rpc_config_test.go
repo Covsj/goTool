@@ -16,7 +16,6 @@ type rpcInfo struct {
 }
 type rpcConfig struct {
 	ethereumProd rpcInfo
-	rinkeby      rpcInfo
 	binanceTest  rpcInfo
 	binanceProd  rpcInfo
 	sherpaxTest  rpcInfo
@@ -37,18 +36,13 @@ type rpcConfig struct {
 
 var rpcs = rpcConfig{
 	ethereumProd: rpcInfo{
-		"https://geth-mainnet.coming.chat",
+		"https://eth.llamarpc.com",
 		"https://etherscan.io",
 		&contracts{
 			USDT: "0xdAC17F958D2ee523a2206206994597C13D831ec7",
 		}},
-	rinkeby: rpcInfo{
-		"https://rinkeby.infura.io/v3/161645ea57d2494d996c4d2de2489419",
-		"",
-		nil,
-	},
 	binanceTest: rpcInfo{
-		"https://data-seed-prebsc-1-s1.binance.org:8545",
+		"https://data-seed-prebsc-1-s1.bnbchain.org:8545",
 		"https://testnet.bscscan.com",
 		&contracts{
 			USDT: "0x6cd2Bf22B3CeaDfF6B8C226487265d81164396C5",
