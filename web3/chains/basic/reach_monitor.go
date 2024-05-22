@@ -26,7 +26,7 @@ type ReachMonitorDelegate interface {
 	// ReachabilityDidFailNode A node request failed
 	ReachabilityDidFailNode(monitor *ReachMonitor, latency *RpcLatency)
 	// ReachabilityDidFinish The entire network connection test task is over
-	// @param overview Overview of the results of all connection tests
+	// @param overview of the results of all connection tests
 	ReachabilityDidFinish(monitor *ReachMonitor, overview string)
 }
 

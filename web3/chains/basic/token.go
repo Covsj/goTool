@@ -16,7 +16,7 @@ type Token interface {
 	BalanceOfAccount(account Account) (*Balance, error)
 
 	BuildTransfer(sender, receiver, amount string) (txn Transaction, err error)
-	// Before invoking this method, it is best to check `CanTransferAll()`
+	// CanTransferAll Before invoking this method, it is best to check `CanTransferAll()`
 	CanTransferAll() bool
 	BuildTransferAll(sender, receiver string) (txn Transaction, err error)
 }

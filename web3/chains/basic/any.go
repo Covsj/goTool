@@ -39,7 +39,7 @@ func NewAny() *Any {
 }
 
 // MarshalJSON `Any` only support Marshal
-func (a Any) MarshalJSON() ([]byte, error) {
+func (a *Any) MarshalJSON() ([]byte, error) {
 	return json.Marshal(a.Value)
 }
 

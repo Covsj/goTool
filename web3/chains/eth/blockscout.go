@@ -24,7 +24,7 @@ func NewBlockScout(url string) *BlockScout {
 	}
 }
 
-// Nfts
+// Nft Nfts
 // - params nextPage: set nil when query first page.
 func (a *BlockScout) Nft(owner string, nextPage *BKSPageParams) (page *BKSNFTPage, err error) {
 	defer basic.CatchPanicAndMapToBasicError(&err)

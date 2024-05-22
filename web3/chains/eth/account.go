@@ -59,8 +59,8 @@ func NewAccountWithMnemonic(mnemonic string) (*Account, error) {
 	}, nil
 }
 
-func AccountWithPrivateKey(privatekey string) (*Account, error) {
-	priData, err := types.HexDecodeString(privatekey)
+func AccountWithPrivateKey(privateKey string) (*Account, error) {
+	priData, err := types.HexDecodeString(privateKey)
 	if err != nil {
 		return nil, err
 	}
@@ -78,7 +78,7 @@ func AccountWithPrivateKey(privatekey string) (*Account, error) {
 	}, nil
 }
 
-// We cannot use name `NewAccountWithPrivateKey`, because android not support.
+// EthAccountWithPrivateKey We cannot use name `NewAccountWithPrivateKey`, because android not support.
 func EthAccountWithPrivateKey(privateKey string) (*Account, error) {
 	privateKey = strings.TrimPrefix(privateKey, "0x")
 	privateKeyECDSA, err := crypto.HexToECDSA(privateKey)
@@ -95,31 +95,31 @@ func EthAccountWithPrivateKey(privateKey string) (*Account, error) {
 
 // MARK - Implement the protocol wallet.Account
 
-// @return privateKey data
+// PrivateKey @return privateKey data
 func (a *Account) PrivateKey() ([]byte, error) {
 	return crypto.FromECDSA(a.privateKeyECDSA), nil
 }
 
-// @return privateKey string that will start with 0x.
+// PrivateKeyHex @return privateKey string that will start with 0x.
 func (a *Account) PrivateKeyHex() (string, error) {
 	bytes := crypto.FromECDSA(a.privateKeyECDSA)
 	return types.HexEncodeToString(bytes), nil
 }
 
-// Is deocde from address
+// PublicKey Is decode from address
 // @return publicKey data
 func (a *Account) PublicKey() []byte {
 	return crypto.FromECDSAPub(&a.privateKeyECDSA.PublicKey)
 }
 
-// The ethereum public key is same as address in coming
+// PublicKeyHex The ethereum public key is same as address in coming
 // @return publicKey string that will start with 0x.
 func (a *Account) PublicKeyHex() string {
 	bytes := crypto.FromECDSAPub(&a.privateKeyECDSA.PublicKey)
 	return types.HexEncodeToString(bytes)
 }
 
-// The ethereum address is same as public key in coming
+// Address The ethereum address is same as public key in coming
 func (a *Account) Address() string {
 	return a.address
 }

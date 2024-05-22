@@ -65,7 +65,7 @@ func MapListConcurrent(list []interface{}, limit int, maper func(interface{}) (i
 		return nil, firstError
 	}
 
-	result := []interface{}{}
+	var result []interface{}
 	for _, item := range list {
 		result = append(result, mapContainer.Map[item])
 	}

@@ -57,7 +57,7 @@ func IsValidAddress(address string) bool {
 	return common.IsHexAddress(address)
 }
 
-// It will check based on eip55 rules
+// IsValidEIP55Address It will check based on eip55 rules
 func IsValidEIP55Address(address string) bool {
 	if !IsValidAddress(address) {
 		return false
