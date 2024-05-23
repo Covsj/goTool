@@ -7,7 +7,6 @@ import (
 	"github.com/Covsj/goTool/web3/chains/basic/inter"
 )
 
-// exchange `Aniable Object` & `Any`
 type Aniable interface {
 	AsAny() *Any
 

@@ -1,30 +1,17 @@
 package basic
 
 import (
+	"crypto/sha256"
 	"errors"
+	"fmt"
 	"math/big"
 	"strconv"
 	"strings"
 	"sync"
+
+	"github.com/tyler-smith/go-bip39"
 )
 
-// This method will traverse the array concurrently and map each object in the array.
-// @param list: [TYPE1], a list that all item is TYPE1
-// @param limit: maximum number of tasks to execute, 0 means no limit
-// @param maper: func(TYPE1) (TYPE2, error), a function that input TYPE1, return TYPE2
-//
-//	you can throw an error to finish task.
-//
-// @return : [TYPE2], a list that all item is TYPE2
-// @example : ```
-//
-//	nums := []interface{}{1, 2, 3, 4, 5, 6}
-//	res, _ := MapListConcurrent(nums, func(i interface{}) (interface{}, error) {
-//	    return strconv.Itoa(i.(int) * 100), nil
-//	})
-//	println(res) // ["100" "200" "300" "400" "500" "600"]
-//
-// ```
 func MapListConcurrent(list []interface{}, limit int, maper func(interface{}) (interface{}, error)) ([]interface{}, error) {
 	thread := 0
 	max := limit
@@ -210,4 +197,54 @@ func BigIntMultiply(b *big.Int, ratio float64) *big.Int {
 	product := f1.Mul(f1, big.NewFloat(ratio))
 	res, _ := product.Int(big.NewInt(0))
 	return res
+}
+
+func CalculateLastWord(mnemonicWords []string) (string, error) {
+	if len(mnemonicWords) != 11 {
+		return "", errors.New("mnemonicWords not 11 length")
+	}
+
+	var wordList = bip39.GetWordList()
+
+	var binaryString string
+
+	for _, word := range mnemonicWords {
+		index, found := FindIndex(wordList, word)
+		if !found {
+			return "", fmt.Errorf("word '%s' not found in BIP-39 word list", word)
+		}
+		binaryString += fmt.Sprintf("%011b", index)
+	}
+	hash := sha256.Sum256(BinaryStringToBytes(binaryString))
+	checksum := fmt.Sprintf("%08b", hash[0])[:4]
+	fullBinaryString := binaryString + checksum
+	lastWordIndex, err := BinaryToDecimal(fullBinaryString[len(fullBinaryString)-11:])
+	if err != nil {
+		return "", err
+	}
+	return wordList[lastWordIndex], nil
+}
+
+func FindIndex(slice []string, val string) (int, bool) {
+	for i, item := range slice {
+		if item == val {
+			return i, true
+		}
+	}
+	return -1, false
+}
+
+func BinaryToDecimal(binaryStr string) (int, error) {
+	num := new(big.Int)
+	num, ok := num.SetString(binaryStr, 2)
+	if !ok {
+		return 0, fmt.Errorf("invalid binary number: %s", binaryStr)
+	}
+	return int(num.Int64()), nil
+}
+
+func BinaryStringToBytes(s string) []byte {
+	bi := new(big.Int)
+	bi.SetString(s, 2)
+	return bi.Bytes()
 }

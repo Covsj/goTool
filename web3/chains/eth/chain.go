@@ -74,8 +74,6 @@ func (c *Chain) BalanceOfAccount(account basic.Account) (*basic.Balance, error) 
 	return c.BalanceOfAddress(account.Address())
 }
 
-// Send the raw transaction on-chain
-// @return the hex hash string
 func (c *Chain) SendRawTransaction(signedTx string) (string, error) {
 	chain, err := GetConnection(c.RpcUrl)
 	if err != nil {
@@ -88,8 +86,6 @@ func (c *Chain) SendSignedTransaction(signedTxn basic.SignedTransaction) (hash *
 	return nil, basic.ErrUnsupportedFunction
 }
 
-// Fetch transaction details through transaction hash
-// Support normal or erc20 transfer
 func (c *Chain) FetchTransactionDetail(hash string) (*basic.TransactionDetail, error) {
 	chain, err := GetConnection(c.RpcUrl)
 	if err != nil {
@@ -109,7 +105,6 @@ func (c *Chain) FetchTransactionDetail(hash string) (*basic.TransactionDetail, e
 	return detail, nil
 }
 
-// Fetch transaction status through transaction hash
 func (c *Chain) FetchTransactionStatus(hash string) basic.TransactionStatus {
 	chain, err := GetConnection(c.RpcUrl)
 	if err != nil {
@@ -118,10 +113,6 @@ func (c *Chain) FetchTransactionStatus(hash string) basic.TransactionStatus {
 	return chain.FetchTransactionStatus(hash)
 }
 
-// Batch fetch the transaction status, the hash list and the return value,
-// which can only be passed as strings separated by ","
-// @param hashListString The hash of the transactions to be queried in batches, a string concatenated with ",": "hash1,hash2,hash3"
-// @return Batch transaction status, its order is consistent with hashListString: "status1,status2,status3"
 func (c *Chain) BatchFetchTransactionStatus(hashListString string) string {
 	chain, err := GetConnection(c.RpcUrl)
 	if err != nil {
@@ -178,8 +169,6 @@ func (c *Chain) buildTransfer(privateKey *ecdsa.PrivateKey, transaction *Transac
 
 	return &basic.OptionalString{Value: txResult.TxHex}, nil
 }
-
-// MARK - Implement the protocol IChain
 
 func (c *Chain) SubmitTransactionData(account basic.Account, to string, data []byte, value string) (string, error) {
 	gasPrice, err := c.SuggestGasPrice()
