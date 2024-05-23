@@ -13,7 +13,7 @@ import (
 	"github.com/ethereum/go-ethereum/rpc"
 )
 
-func findIndex(slice []string, val string) (int, bool) {
+func FindIndex(slice []string, val string) (int, bool) {
 	for i, item := range slice {
 		if item == val {
 			return i, true
@@ -22,7 +22,7 @@ func findIndex(slice []string, val string) (int, bool) {
 	return -1, false
 }
 
-func binaryToDecimal(binaryStr string) (int, error) {
+func BinaryToDecimal(binaryStr string) (int, error) {
 	num := new(big.Int)
 	num, ok := num.SetString(binaryStr, 2)
 	if !ok {
@@ -31,7 +31,7 @@ func binaryToDecimal(binaryStr string) (int, error) {
 	return int(num.Int64()), nil
 }
 
-func binaryStringToBytes(s string) []byte {
+func BinaryStringToBytes(s string) []byte {
 	bi := new(big.Int)
 	bi.SetString(s, 2)
 	return bi.Bytes()

@@ -14,7 +14,7 @@ import (
 )
 
 func CreateTransaction(h Handler, address string, to, gasLimit, gasPrice, value, data string) (*types.Transaction, error) {
-	nonce, err := GetWalletNonce(h, address)
+	nonce, err := WalletNonce(h, address)
 	if err != nil {
 		return nil, err
 	}
