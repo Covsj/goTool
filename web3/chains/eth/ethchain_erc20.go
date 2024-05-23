@@ -15,24 +15,19 @@ import (
 )
 
 const (
-	// 合约 ABI json文件，查询ERC20 相关代币信息需要使用 ABI 文件
+	// Erc20AbiStr 合约 ABI json文件，查询ERC20 相关代币信息需要使用 ABI 文件
 	Erc20AbiStr = `[{"inputs":[{"internalType":"address","name":"operator","type":"address"},{"internalType":"address","name":"pauser","type":"address"},{"internalType":"string","name":"name","type":"string"},{"internalType":"string","name":"symbol","type":"string"},{"internalType":"uint8","name":"decimal","type":"uint8"}],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":true,"internalType":"address","name":"spender","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Approval","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"address","name":"account","type":"address"}],"name":"Paused","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Transfer","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"address","name":"account","type":"address"}],"name":"Unpaused","type":"event"},{"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"address","name":"spender","type":"address"}],"name":"allowance","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"approve","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"account","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"account","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"burn","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"new_operator","type":"address"},{"internalType":"address","name":"new_pauser","type":"address"}],"name":"changeUser","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"decimals","outputs":[{"internalType":"uint8","name":"","type":"uint8"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"subtractedValue","type":"uint256"}],"name":"decreaseAllowance","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"addedValue","type":"uint256"}],"name":"increaseAllowance","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"account","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"mint","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"name","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"pause","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"paused","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"symbol","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalSupply","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"recipient","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"transfer","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"sender","type":"address"},{"internalType":"address","name":"recipient","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"transferFrom","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"unpause","outputs":[],"stateMutability":"nonpayable","type":"function"}]`
-	// erc721 的 ABI 文件, 只支持 transferFrom 方法
+	// Erc721Abi_TransferOnly erc721 的 ABI 文件, 只支持 transferFrom 方法
 	Erc721Abi_TransferOnly = `[{"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"transferFrom","outputs":[],"stateMutability":"nonpayable","type":"function"}]`
 )
 
-// Deprecated: SdkBatchTokenBalance is deprecated. Please Use Chain.BatchFetchErc20TokenBalance() instead.
-func (e *EthChain) SdkBatchTokenBalance(contractListString, address string) (string, error) {
+// SdkBatchTokenBalance 批量请求代币余额
+func (e *EthChain) SdkBatchTokenBalance(contractListString []string, address string) (string, error) {
 	c := NewChainWithRpc(e.rpcUrl)
 	return c.BatchFetchErc20TokenBalance(contractListString, address)
 }
 
-// Deprecated: Erc20TokenInfo is deprecated. Please Use Chain.Erc20Token().Erc20TokenInfo()
-// @title    Erc20代币基础信息
-// @description   返回代币基础信息
-// @auth      清欢
-// @param     (contractAddress, walletAddress)     (string,string)  合约名称，钱包地址
-// @return    (*Erc20Token,error)       Erc20Token，错误信息
+// Erc20TokenInfo 返回代币基础信息
 func (e *EthChain) Erc20TokenInfo(contractAddress string, walletAddress string) (*Erc20TokenInfo, error) {
 	var token = Erc20TokenInfo{TokenInfo: &basic.TokenInfo{}}
 	token.ContractAddress = contractAddress
@@ -57,11 +52,7 @@ func (e *EthChain) Erc20TokenInfo(contractAddress string, walletAddress string) 
 	return &token, nil
 }
 
-// @title    Erc20代币余额
-// @description   返回erc20代币余额
-// @auth      清欢
-// @param     (contractAddress，walletAddress)     合约地址,钱包地址
-// @return    (string,error)       余额，错误信息
+// TokenBalance 返回erc20代币余额
 func (e *EthChain) TokenBalance(contractAddress, address string) (string, error) {
 	if len(contractAddress) == 0 || len(address) == 0 {
 		return "0", errors.New("The address of the contract or wallet is empty.")
@@ -82,11 +73,7 @@ func (e *EthChain) TokenBalance(contractAddress, address string) (string, error)
 	return result.String(), err
 }
 
-// @title    Erc20代币精度
-// @description   返回代币精度
-// @auth      清欢
-// @param     (contractAddress)     合约地址
-// @return    (string,error)       代币精度，错误信息
+// TokenDecimal 返回代币精度
 func (e *EthChain) TokenDecimal(contractAddress string) (int16, error) {
 	decimal := uint8(0)
 	err := e.CallContractConstant(
@@ -102,11 +89,7 @@ func (e *EthChain) TokenDecimal(contractAddress string) (int16, error) {
 	return int16(decimal), err
 }
 
-// @title    Erc20代币符号
-// @description   返回代币符号
-// @auth      清欢
-// @param     (contractAddress)     合约地址
-// @return    (string,error)       符号，错误信息
+// TokenSymbol 返回代币符号
 func (e *EthChain) TokenSymbol(contractAddress string) (string, error) {
 	tokenSymbol := ""
 	err := e.CallContractConstant(
@@ -123,11 +106,7 @@ func (e *EthChain) TokenSymbol(contractAddress string) (string, error) {
 	return tokenSymbol, err
 }
 
-// @title    Erc20代币名称
-// @description   返回代币名称
-// @auth      清欢
-// @param     (contractAddress)     合约地址
-// @return    (string,error)       名称，错误信息
+// TokenName 返回代币名称
 func (e *EthChain) TokenName(contractAddress string) (string, error) {
 	tokenName := ""
 	err := e.CallContractConstant(
@@ -144,8 +123,7 @@ func (e *EthChain) TokenName(contractAddress string) (string, error) {
 	return tokenName, err
 }
 
-// Call Contract
-
+// CallContractConstant 调用以太坊智能合约
 func (e *EthChain) CallContractConstant(out interface{}, contractAddress, abiStr, methodName string, opts *bind.CallOpts, params ...interface{}) (err error) {
 	defer basic.CatchPanicAndMapToBasicError(&err)
 	parsedAbi, err := abi.JSON(strings.NewReader(abiStr))
@@ -161,11 +139,13 @@ func (e *EthChain) CallContractConstant(out interface{}, contractAddress, abiStr
 	if !ok {
 		return errors.New("method not found")
 	}
-	err = e.CallContractConstantWithPayload(out, contractAddress, hex.EncodeToString(inputParams), method.Outputs, opts)
+	err = e.CallContractConstantWithPayload(out, contractAddress, hex.EncodeToString(inputParams),
+		method.Outputs, opts)
 	return err
 }
 
-func (e *EthChain) CallContractConstantWithPayload(out interface{}, contractAddress, payload string, outputTypes abi.Arguments, opts *bind.CallOpts) (err error) {
+func (e *EthChain) CallContractConstantWithPayload(out interface{}, contractAddress, payload string,
+	outputTypes abi.Arguments, opts *bind.CallOpts) (err error) {
 	defer basic.CatchPanicAndMapToBasicError(&err)
 
 	if opts == nil {

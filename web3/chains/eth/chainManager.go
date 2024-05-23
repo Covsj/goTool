@@ -7,7 +7,7 @@ import (
 var chainConnections = make(map[string]*EthChain)
 var lock sync.RWMutex
 
-// 通过 rpcUrl, 获取 eth 的连接对象
+// GetConnection 通过 rpcUrl, 获取 eth 的连接对象
 func GetConnection(rpcUrl string) (*EthChain, error) {
 	return getConnectionWithTimeout(rpcUrl, 0)
 }

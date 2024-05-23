@@ -26,7 +26,7 @@ func (e *EthChain) UnpackParams(out interface{}, inputs abi.Arguments, paramsStr
 	return nil
 }
 
-// 不带 0x 前缀
+// PackParams 不带 0x 前缀
 func (e *EthChain) PackParams(inputs abi.Arguments, args ...interface{}) (string, error) {
 	bytes_, err := inputs.Pack(args...)
 	if err != nil {

@@ -13,7 +13,7 @@ import (
 	"github.com/ethereum/go-ethereum/crypto"
 )
 
-// 使用私钥对信息进行签名
+// SignMsg 使用私钥对信息进行签名
 func (e *EthChain) SignMsg(privateKey string, data string) (string, error) {
 	privateKey = strings.TrimPrefix(privateKey, "0x")
 	privateKeyHex, err := hex.DecodeString(privateKey)
@@ -40,11 +40,7 @@ func (e *EthChain) SignMsg(privateKey string, data string) (string, error) {
 	return hex.EncodeToString(signature), nil
 }
 
-// @title    SignTransaction
-// @description   对交易进行签名
-// @auth      清欢
-// @param     (tx, privateKey)     (*types.Transaction,string)  合约名称，钱包地址
-// @return    (*BuildTxResult,error)       签名结果，失败
+// SignTransaction 对交易进行签名
 func (e *EthChain) SignTransaction(tx *types.Transaction, privateKey string) (*BuildTxResult, error) {
 	privateKey = strings.TrimPrefix(privateKey, "0x")
 	privateKeyHex, err := hex.DecodeString(privateKey)
@@ -78,7 +74,7 @@ func (e *EthChain) SignTransaction(tx *types.Transaction, privateKey string) (*B
 	}, nil
 }
 
-// 以太坊的 hash 专门在数据前面加上了一段话
+// SignHashForMsg 以太坊的 hash 专门在数据前面加上了一段话
 func (e *EthChain) SignHashForMsg(data string) (string, error) {
 	msg := fmt.Sprintf("\x19Ethereum Signed Message:\n%d%s", len(data), data)
 	return hex.EncodeToString(crypto.Keccak256([]byte(msg))), nil

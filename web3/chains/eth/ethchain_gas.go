@@ -23,7 +23,7 @@ func (e *EthChain) gasFactor() float64 {
 	return 1.3
 }
 
-// 获取标准gas价格
+// SuggestGasPrice 获取标准gas价格
 func (e *EthChain) SuggestGasPrice() (string, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), e.timeout)
 	defer cancel()

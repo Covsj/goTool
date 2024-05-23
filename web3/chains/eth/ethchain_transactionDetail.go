@@ -38,14 +38,12 @@ func decodeSigner(txn *types.Transaction) (common.Address, error) {
 	return types.Sender(signer, txn)
 }
 
-// 获取交易的详情
-// @param hashString 交易的 hash
-// @return 交易详情 和 交易原文信息
+// FetchTransactionDetail 获取交易的详情
 func (e *EthChain) FetchTransactionDetail(hashString string) (detail *basic.TransactionDetail, txn *types.Transaction, err error) {
 	defer basic.CatchPanicAndMapToBasicError(&err)
 
-	if e.chainId.Int64() == zksync_chainid || e.chainId.Int64() == zksync_chainid_testnet {
-		return e.zksync_FetchTransactionDetail(hashString)
+	if e.chainId.Int64() == zksyncChainId || e.chainId.Int64() == zksyncChainIdTestnet {
+		return e.zksyncFetchTransactionDetail(hashString)
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), e.timeout)
 	defer cancel()
@@ -120,8 +118,7 @@ func (e *EthChain) FetchTransactionDetail(hashString string) (detail *basic.Tran
 	return detail, tx, nil
 }
 
-// 获取交易的状态
-// @param hashString 交易的 hash
+// FetchTransactionStatus 获取交易的状态
 func (e *EthChain) FetchTransactionStatus(hashString string) basic.TransactionStatus {
 	if len(hashString) == 0 {
 		return basic.TransactionStatusNone
@@ -149,9 +146,7 @@ func (e *EthChain) FetchTransactionStatus(hashString string) basic.TransactionSt
 	}
 }
 
-// 批量获取交易的转账状态
-// @param hashList 要批量查询的交易的 hash 数组
-// @return 交易状态数组，它的顺序和 hashList 是保持一致的
+// BatchTransactionStatus 批量获取交易的转账状态
 func (e *EthChain) BatchTransactionStatus(hashList []string) []string {
 	statuses, _ := basic.MapListConcurrentStringToString(hashList, func(s string) (string, error) {
 		return strconv.Itoa(e.FetchTransactionStatus(s)), nil
@@ -159,9 +154,7 @@ func (e *EthChain) BatchTransactionStatus(hashList []string) []string {
 	return statuses
 }
 
-// SDK 批量获取交易的转账状态，hash 列表和返回值，都只能用字符串，逗号隔开传递
-// @param hashListString 要批量查询的交易的 hash，用逗号拼接的字符串："hash1,hash2,hash3"
-// @return 批量的交易状态，它的顺序和 hashListString 是保持一致的: "status1,status2,status3"
+// SdkBatchTransactionStatus SDK 批量获取交易的转账状态，hash 列表和返回值，都只能用字符串，逗号隔开传递
 func (e *EthChain) SdkBatchTransactionStatus(hashListString string) string {
 	hashList := strings.Split(hashListString, ",")
 	statuses := e.BatchTransactionStatus(hashList)

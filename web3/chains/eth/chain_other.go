@@ -41,14 +41,10 @@ func (c *Chain) LatestBlockNumber() (s string, err error) {
 	return strconv.FormatInt(n, 10), nil
 }
 
-// SDK 批量请求代币余额，因为 golang 导出的方法不支持数组，因此传参和返回都只能用字符串
-// @param contractListString 批量查询的代币的合约地址字符串，用逗号隔开，例如: "add1,add2,add3"
-// @param address 用户的钱包地址
-// @return 余额列表，顺序与传入合约顺序是保持一致的，例如: "b1,b2,b3"
-// @throw 如果任意一个代币请求余额出错时，会抛出错误
-func (c *Chain) BatchFetchErc20TokenBalance(contractListString, address string) (string, error) {
-	contractList := strings.Split(contractListString, ",")
-	balances, err := c.BatchErc20TokenBalance(contractList, address)
+// BatchFetchErc20TokenBalance SDK 批量请求代币余额
+func (c *Chain) BatchFetchErc20TokenBalance(contractListString []string, address string) (string, error) {
+	//contractList := strings.Split(contractListString, ",")
+	balances, err := c.BatchErc20TokenBalance(contractListString, address)
 	if err != nil {
 		return "", err
 	}

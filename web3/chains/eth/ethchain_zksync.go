@@ -11,10 +11,10 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 )
 
-const zksync_chainid = 324
-const zksync_chainid_testnet = 280
+const zksyncChainId = 324
+const zksyncChainIdTestnet = 280
 
-type zksync_Transaction struct {
+type zksyncTransaction struct {
 	BlockHash            common.Hash    `json:"blockHash"`
 	BlockNumber          *hexutil.Big   `json:"blockNumber"`
 	ChainID              hexutil.Big    `json:"chainId"`
@@ -37,12 +37,12 @@ type zksync_Transaction struct {
 	S                    hexutil.Big    `json:"s"`
 }
 
-func (e *EthChain) zksync_FetchTransactionDetail(hashString string) (detail *basic.TransactionDetail, txn *types.Transaction, err error) {
+func (e *EthChain) zksyncFetchTransactionDetail(hashString string) (detail *basic.TransactionDetail, txn *types.Transaction, err error) {
 	defer basic.CatchPanicAndMapToBasicError(&err)
 
 	ctx, cancel := context.WithTimeout(context.Background(), e.timeout)
 	defer cancel()
-	var tx *zksync_Transaction
+	var tx *zksyncTransaction
 	err = e.RemoteRpcClient.Client().CallContext(ctx, &tx, "eth_getTransactionByHash", hashString)
 	if err != nil {
 		return
