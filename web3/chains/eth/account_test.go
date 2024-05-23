@@ -177,7 +177,7 @@ func TestSignAndVerify(t *testing.T) {
 	}
 }
 
-func TestAccountWithPrivatekey(t *testing.T) {
+func TestAccountWithPrivateKey(t *testing.T) {
 	mnemonic := testcase.M1
 	accountFromMnemonic, err := NewAccountWithMnemonic(mnemonic)
 	require.Nil(t, err)

@@ -1,17 +1,89 @@
-package evm
+package basic
 
 import (
-	"context"
+	"crypto/sha256"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"math/big"
 	"strings"
 
+	"github.com/btcsuite/btcd/btcutil/hdkeychain"
+	"github.com/btcsuite/btcd/chaincfg"
+	"github.com/ethereum/go-ethereum/accounts"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/ethereum/go-ethereum/ethclient"
-	"github.com/ethereum/go-ethereum/rpc"
+	"github.com/tyler-smith/go-bip39"
 )
+
+func CreateNewWalletByMnemonic() (mnemonic, priKey, address string, err error) {
+	entropy, err := bip39.NewEntropy(128)
+	if err != nil {
+		return "", "", "", err
+	}
+	mnemonic, err = bip39.NewMnemonic(entropy)
+	if err != nil {
+		return "", "", "", err
+	}
+
+	seed := bip39.NewSeed(mnemonic, "")
+	masterKey, err := hdkeychain.NewMaster(seed, &chaincfg.MainNetParams)
+	if err != nil {
+		return "", "", "", err
+	}
+
+	path, err := accounts.ParseDerivationPath("m/44'/60'/0'/0/0")
+	if err != nil {
+		return "", "", "", err
+	}
+
+	key := masterKey
+	for _, n := range path {
+		key, err = key.DeriveNonStandard(n)
+		if err != nil {
+			return "", "", "", err
+		}
+	}
+
+	privateKey, err := key.ECPrivKey()
+	if err != nil {
+		return "", "", "", err
+	}
+
+	privateKeyECDSA := privateKey.ToECDSA()
+
+	privateKeyBytes := crypto.FromECDSA(privateKeyECDSA)
+	priKey = strings.TrimPrefix(hexutil.Encode(privateKeyBytes)[2:], "0x")
+
+	address = crypto.PubkeyToAddress(privateKeyECDSA.PublicKey).Hex()
+	return mnemonic, priKey, address, nil
+}
+
+func CalculateLastWord(mnemonicWords []string) (string, error) {
+	if len(mnemonicWords) != 11 {
+		return "", errors.New("mnemonicWords not 11 length")
+	}
+
+	var wordList = bip39.GetWordList()
+
+	var binaryString string
+
+	for _, word := range mnemonicWords {
+		index, found := FindIndex(wordList, word)
+		if !found {
+			return "", fmt.Errorf("word '%s' not found in BIP-39 word list", word)
+		}
+		binaryString += fmt.Sprintf("%011b", index)
+	}
+	hash := sha256.Sum256(BinaryStringToBytes(binaryString))
+	checksum := fmt.Sprintf("%08b", hash[0])[:4]
+	fullBinaryString := binaryString + checksum
+	lastWordIndex, err := BinaryToDecimal(fullBinaryString[len(fullBinaryString)-11:])
+	if err != nil {
+		return "", err
+	}
+	return wordList[lastWordIndex], nil
+}
 
 func FindIndex(slice []string, val string) (int, bool) {
 	for i, item := range slice {
@@ -35,23 +107,6 @@ func BinaryStringToBytes(s string) []byte {
 	bi := new(big.Int)
 	bi.SetString(s, 2)
 	return bi.Bytes()
-}
-
-func CreateClient(rawUrl string) (client *ethclient.Client, c *rpc.Client, err error) {
-	for i := 0; i < 3; i++ {
-		ctx := context.Background()
-		c, err := rpc.DialContext(ctx, rawUrl)
-		if err != nil {
-			return nil, nil, err
-		}
-		client = ethclient.NewClient(c)
-		if err != nil {
-			continue
-		} else {
-			return client, c, nil
-		}
-	}
-	return nil, nil, err
 }
 
 func ConvertBigIntToString(balance *big.Int, decimals uint8) string {

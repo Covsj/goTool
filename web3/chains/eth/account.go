@@ -9,7 +9,6 @@ import (
 	"github.com/btcsuite/btcd/btcutil/hdkeychain"
 	"github.com/btcsuite/btcd/chaincfg"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
-
 	"github.com/ethereum/go-ethereum/accounts"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/tyler-smith/go-bip39"
@@ -152,7 +151,7 @@ func (a *Account) SignHash(hash []byte) ([]byte, error) {
 	return signature, nil
 }
 
-// 以太坊的 hash 专门在数据前面加上了一段话
+// SignHashForMsg 以太坊的 hash 专门在数据前面加上了一段话
 func SignHashForMsg(data string) []byte {
 	msg := fmt.Sprintf("\x19Ethereum Signed Message:\n%d%s", len(data), data)
 	return crypto.Keccak256([]byte(msg))
