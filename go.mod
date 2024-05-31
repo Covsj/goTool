@@ -8,16 +8,19 @@ replace github.com/99designs/keyring => github.com/coming-chat/keyring v1.3.0
 
 require (
 	github.com/ChainSafe/go-schnorrkel v1.0.0
+	github.com/blocto/solana-go-sdk v1.30.0
 	github.com/btcsuite/btcd v0.24.0
 	github.com/btcsuite/btcd/btcec/v2 v2.3.2
 	github.com/btcsuite/btcd/btcutil v1.1.5
 	github.com/centrifuge/go-substrate-rpc-client/v4 v4.0.0
+	github.com/coming-chat/wallet-SDK v0.2.6
 	github.com/emersion/go-imap v1.2.1
 	github.com/emersion/go-message v0.17.0
 	github.com/ethereum/go-ethereum v1.13.7
 	github.com/garyburd/redigo v1.6.4
 	github.com/go-sql-driver/mysql v1.7.1
 	github.com/gorilla/websocket v1.5.0
+	github.com/mr-tron/base58 v1.2.0
 	github.com/pierrec/xxHash v0.1.5
 	github.com/samuel/go-zookeeper v0.0.0-20201211165307-7117e9ea2414
 	github.com/shopspring/decimal v1.4.0
@@ -30,11 +33,11 @@ require (
 )
 
 require (
+	filippo.io/edwards25519 v1.0.0-rc.1 // indirect
 	github.com/Microsoft/go-winio v0.6.1 // indirect
 	github.com/StackExchange/wmi v1.2.1 // indirect
 	github.com/bits-and-blooms/bitset v1.10.0 // indirect
 	github.com/btcsuite/btcd/chaincfg/chainhash v1.1.0 // indirect
-	github.com/btcsuite/btcutil v1.0.3-0.20201208143702-a53e38424cce // indirect
 	github.com/consensys/bavard v0.1.13 // indirect
 	github.com/consensys/gnark-crypto v0.12.1 // indirect
 	github.com/cosmos/go-bip39 v1.0.0 // indirect
@@ -55,6 +58,7 @@ require (
 	github.com/holiman/uint256 v1.2.4 // indirect
 	github.com/mimoo/StrobeGo v0.0.0-20210601165009-122bf33a46e0 // indirect
 	github.com/mmcloughlin/addchain v0.4.0 // indirect
+	github.com/near/borsh-go v0.3.2-0.20220516180422-1ff87d108454 // indirect
 	github.com/oasisprotocol/curve25519-voi v0.0.0-20220328075252-7dd334e3daae // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/shirou/gopsutil v3.21.4-0.20210419000835-c7a38de76ee5+incompatible // indirect
