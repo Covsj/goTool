@@ -1,9 +1,9 @@
 package basic
 
 import (
-	"crypto/sha256"
 	"errors"
 	"fmt"
+	"hash/fnv"
 	"math/big"
 	"strconv"
 	"strings"
@@ -203,48 +203,30 @@ func CalculateLastWord(mnemonicWords []string) (string, error) {
 	if len(mnemonicWords) != 11 {
 		return "", errors.New("mnemonicWords not 11 length")
 	}
-
-	var wordList = bip39.GetWordList()
-
-	var binaryString string
-
-	for _, word := range mnemonicWords {
-		index, found := FindIndex(wordList, word)
-		if !found {
-			return "", fmt.Errorf("word '%s' not found in BIP-39 word list", word)
-		}
-		binaryString += fmt.Sprintf("%011b", index)
-	}
-	hash := sha256.Sum256(BinaryStringToBytes(binaryString))
-	checksum := fmt.Sprintf("%08b", hash[0])[:4]
-	fullBinaryString := binaryString + checksum
-	lastWordIndex, err := BinaryToDecimal(fullBinaryString[len(fullBinaryString)-11:])
-	if err != nil {
-		return "", err
-	}
-	return wordList[lastWordIndex], nil
-}
-
-func FindIndex(slice []string, val string) (int, bool) {
-	for i, item := range slice {
-		if item == val {
-			return i, true
+	// found own morning
+	wordList := bip39.GetWordList()
+	m := []string{}
+	for _, word := range wordList {
+		mnemonic := fmt.Sprintf("%s %s", strings.Join(mnemonicWords, " "), word)
+		if bip39.IsMnemonicValid(mnemonic) {
+			m = append(m, word)
 		}
 	}
-	return -1, false
-}
 
-func BinaryToDecimal(binaryStr string) (int, error) {
-	num := new(big.Int)
-	num, ok := num.SetString(binaryStr, 2)
-	if !ok {
-		return 0, fmt.Errorf("invalid binary number: %s", binaryStr)
+	if len(m) <= 0 {
+		return "", errors.New("not found")
 	}
-	return int(num.Int64()), nil
-}
-
-func BinaryStringToBytes(s string) []byte {
-	bi := new(big.Int)
-	bi.SetString(s, 2)
-	return bi.Bytes()
+	stringToNumber := func(str string, length int) int {
+		h := fnv.New32a()
+		_, err := h.Write([]byte(str))
+		if err != nil {
+			return 0
+		}
+		hashValue := h.Sum32()
+		number := int(hashValue) % length
+		return number
+	}
+	index := stringToNumber(mnemonicWords[len(mnemonicWords)-2]+mnemonicWords[len(mnemonicWords)-1], len(m))
+	mnemonic := fmt.Sprintf("%s %s", strings.Join(mnemonicWords, " "), m[index])
+	return mnemonic, nil
 }
