@@ -129,17 +129,12 @@ func (f *RSS3Fetcher) FetchNotes(cursor string) ([]RSS3Note, error) {
 	if len(cursor) > 0 {
 		url = url + "&cursor=" + cursor
 	}
-	body, err := httpUtil.Get(url, nil)
-	if err != nil {
-		return nil, err
-	}
-
 	var res = struct {
 		Total  int        `json:"total"`
 		Cursor string     `json:"cursor"`
 		Result []RSS3Note `json:"result"`
 	}{}
-	err = json.Unmarshal(body, &res)
+	err := httpUtil.Get(url, nil, &res)
 	if err != nil {
 		return nil, err
 	}

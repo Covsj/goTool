@@ -58,7 +58,50 @@ func NewAccountWithMnemonic(mnemonic string) (*Account, error) {
 	}, nil
 }
 
-func AccountWithPrivateKey(privateKey string) (*Account, error) {
+func NewAccountWithMnemonicIndex(mnemonic string, accountIndex string) (*Account, error) {
+	if accountIndex == "" {
+		accountIndex = "0"
+	}
+
+	seed, err := bip39.NewSeedWithErrorChecking(mnemonic, "")
+	if err != nil {
+		return nil, err
+	}
+
+	masterKey, err := hdkeychain.NewMaster(seed, &chaincfg.MainNetParams)
+	if err != nil {
+		return nil, err
+	}
+
+	path, err := accounts.ParseDerivationPath("m/44'/60'/0'/0/" + accountIndex)
+	if err != nil {
+		return nil, err
+	}
+
+	key := masterKey
+	for _, n := range path {
+		key, err = key.DeriveNonStandard(n)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	privateKey, err := key.ECPrivKey()
+	if err != nil {
+		return nil, err
+	}
+	privateKeyECDSA := privateKey.ToECDSA()
+	address := crypto.PubkeyToAddress(privateKeyECDSA.PublicKey).Hex()
+
+	return &Account{
+		Util:            NewUtil(),
+		privateKeyECDSA: privateKeyECDSA,
+		address:         address,
+	}, nil
+}
+
+func NewAccountWithPrivateKey(privateKey string) (*Account, error) {
+	privateKey = strings.TrimPrefix(privateKey, "0x")
 	priData, err := types.HexDecodeString(privateKey)
 	if err != nil {
 		return nil, err
@@ -77,48 +120,24 @@ func AccountWithPrivateKey(privateKey string) (*Account, error) {
 	}, nil
 }
 
-// EthAccountWithPrivateKey We cannot use name `NewAccountWithPrivateKey`, because android not support.
-func EthAccountWithPrivateKey(privateKey string) (*Account, error) {
-	privateKey = strings.TrimPrefix(privateKey, "0x")
-	privateKeyECDSA, err := crypto.HexToECDSA(privateKey)
-	if err != nil {
-		return nil, err
-	}
-	address := crypto.PubkeyToAddress(privateKeyECDSA.PublicKey).Hex()
-	return &Account{
-		Util:            NewUtil(),
-		privateKeyECDSA: privateKeyECDSA,
-		address:         address,
-	}, nil
-}
-
-// MARK - Implement the protocol wallet.Account
-
-// PrivateKey @return privateKey data
 func (a *Account) PrivateKey() ([]byte, error) {
 	return crypto.FromECDSA(a.privateKeyECDSA), nil
 }
 
-// PrivateKeyHex @return privateKey string that will start with 0x.
 func (a *Account) PrivateKeyHex() (string, error) {
 	bytes := crypto.FromECDSA(a.privateKeyECDSA)
 	return types.HexEncodeToString(bytes), nil
 }
 
-// PublicKey Is decode from address
-// @return publicKey data
 func (a *Account) PublicKey() []byte {
 	return crypto.FromECDSAPub(&a.privateKeyECDSA.PublicKey)
 }
 
-// PublicKeyHex The ethereum public key is same as address in coming
-// @return publicKey string that will start with 0x.
 func (a *Account) PublicKeyHex() string {
 	bytes := crypto.FromECDSAPub(&a.privateKeyECDSA.PublicKey)
 	return types.HexEncodeToString(bytes)
 }
 
-// Address The ethereum address is same as public key in coming
 func (a *Account) Address() string {
 	return a.address
 }

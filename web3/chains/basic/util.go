@@ -12,9 +12,10 @@ import (
 	"github.com/tyler-smith/go-bip39"
 )
 
-func MapListConcurrent(list []interface{}, limit int, maper func(interface{}) (interface{}, error)) ([]interface{}, error) {
+// MapListConcurrent 多协程转换数据
+func MapListConcurrent(list []interface{}, threads int, fn func(interface{}) (interface{}, error)) ([]interface{}, error) {
 	thread := 0
-	max := limit
+	max := threads
 	wg := sync.WaitGroup{}
 
 	mapContainer := newSafeMap()
@@ -37,11 +38,11 @@ func MapListConcurrent(list []interface{}, limit int, maper func(interface{}) (i
 		}
 
 		go func(w *sync.WaitGroup, item interface{}, mapContainer *safeMap, firstError *error) {
-			maped, err := maper(item)
+			res, err := fn(item)
 			if *firstError == nil && err != nil {
 				*firstError = err
 			} else {
-				mapContainer.writeMap(item, maped)
+				mapContainer.writeMap(item, res)
 			}
 			wg.Done()
 		}(&wg, item, mapContainer, &firstError)
@@ -59,14 +60,14 @@ func MapListConcurrent(list []interface{}, limit int, maper func(interface{}) (i
 	return result, nil
 }
 
-// MapListConcurrentStringToString The encapsulation of MapListConcurrent.
-func MapListConcurrentStringToString(strList []string, maper func(string) (string, error)) ([]string, error) {
+// MapListConcurrentStringToString 多协程转换字符串数据,默认10协程
+func MapListConcurrentStringToString(strList []string, fn func(string) (string, error)) ([]string, error) {
 	list := make([]interface{}, len(strList))
 	for i, s := range strList {
 		list[i] = s
 	}
 	temp, err := MapListConcurrent(list, 10, func(i interface{}) (interface{}, error) {
-		return maper(i.(string))
+		return fn(i.(string))
 	})
 	if err != nil {
 		return nil, err
@@ -79,7 +80,6 @@ func MapListConcurrentStringToString(strList []string, maper func(string) (strin
 	return result, nil
 }
 
-// MaxBigInt Return the more big of the two numbers
 func MaxBigInt(x, y *big.Int) *big.Int {
 	if x.Cmp(y) > 0 {
 		return x
@@ -88,7 +88,6 @@ func MaxBigInt(x, y *big.Int) *big.Int {
 	}
 }
 
-// Max @note float64 should use `math.Max()`
 func Max[T int | int8 | int16 | int32 | int64 | uint | uint8 | uint16 | uint32 | uint64 | float32 | string](x, y T) T {
 	if x >= y {
 		return x
@@ -97,7 +96,6 @@ func Max[T int | int8 | int16 | int32 | int64 | uint | uint8 | uint16 | uint32 |
 	}
 }
 
-// Min @note float64 should use `math.Min()`
 func Min[T int | int8 | int16 | int32 | int64 | uint | uint8 | uint16 | uint32 | uint64 | float32 | string](x, y T) T {
 	if x <= y {
 		return x
@@ -199,6 +197,7 @@ func BigIntMultiply(b *big.Int, ratio float64) *big.Int {
 	return res
 }
 
+// CalculateLastWord 根据传入的11个助记词，计算最后助记词
 func CalculateLastWord(mnemonicWords []string) (string, error) {
 	if len(mnemonicWords) != 11 {
 		return "", errors.New("mnemonicWords not 11 length")

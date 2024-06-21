@@ -121,11 +121,12 @@ func (c *Chain) BatchFetchTransactionStatus(hashListString string) string {
 	return chain.SdkBatchTransactionStatus(hashListString)
 }
 
-func (c *Chain) EstimateTransactionFee(transaction basic.Transaction) (fee *basic.OptionalString, err error) {
-	return nil, basic.ErrUnsupportedFunction
-}
 func (c *Chain) EstimateTransactionFeeUsePublicKey(transaction basic.Transaction, pubkey string) (fee *basic.OptionalString, err error) {
 	return c.EstimateTransactionFee(transaction)
+}
+
+func (c *Chain) EstimateTransactionFee(transaction basic.Transaction) (fee *basic.OptionalString, err error) {
+	return nil, basic.ErrUnsupportedFunction
 }
 
 func (c *Chain) BuildTransferTx(privateKey string, transaction *Transaction) (*basic.OptionalString, error) {

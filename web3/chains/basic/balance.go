@@ -11,7 +11,6 @@ type Balance struct {
 	Usable string
 }
 
-// Deprecated: use `NewBalance("0")`
 func EmptyBalance() *Balance {
 	return &Balance{
 		Total:  "0",

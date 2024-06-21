@@ -1,7 +1,6 @@
 package eth
 
 import (
-	"encoding/json"
 	"reflect"
 	"strconv"
 	"testing"
@@ -57,15 +56,6 @@ func TestRSS3Notes(t *testing.T) {
 
 func TestBEVMjosjo(t *testing.T) {
 	url := "https://eth.blockscout.com/api/v2/addresses/0x30b31174e5FEd4598aA0dF3191EbAA5AAb48d43E/tokens"
-	datas, err := httpUtil.Get(url, map[string]string{
-		"type":       "ERC-721",
-		"fiat_value": "",
-		"id":         "4674005429",
-		"value":      "3",
-		// "items_count": "550",
-	})
-	require.Nil(t, err)
-
 	var resp struct {
 		Items []struct {
 			Token struct {
@@ -81,7 +71,13 @@ func TestBEVMjosjo(t *testing.T) {
 		} `json:"next_page_params"`
 	}
 
-	err = json.Unmarshal(datas, &resp)
+	err := httpUtil.Get(url, map[string]string{
+		"type":       "ERC-721",
+		"fiat_value": "",
+		"id":         "4674005429",
+		"value":      "3",
+		// "items_count": "550",
+	}, &resp)
 	require.Nil(t, err)
 
 	total := int64(0)

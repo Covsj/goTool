@@ -9,26 +9,8 @@ import (
 
 type Aniable interface {
 	AsAny() *Any
-
-	// You need to implement the following methods if your class name is Xxx
-	// func AsXxx(a *Any) *Xxx
-
-	// ======= template
-	// func (a *Xxx) AsAny() *base.Any {
-	// 	return &base.Any{Value: a}
-	// }
-	//	func AsXxx(a *base.Any) *Xxx {
-	//		if r, ok := a.Value.(*Xxx); ok {
-	//			return r
-	//		}
-	//		if r, ok := a.Value.(Xxx); ok {
-	//			return &r
-	//		}
-	//		return nil
-	//	}
 }
 
-// Any 如果需要自定义类型支持 Any, 需要遵循协议 Aniable
 type Any struct {
 	Value any
 }
@@ -72,8 +54,6 @@ func (a *Any) GetUInt32() *BigInt { return &BigInt{new(big.Int).SetUint64(uint64
 func (a *Any) GetUInt64() *BigInt { return &BigInt{new(big.Int).SetUint64(*a.Value.(*uint64))} }
 func (a *Any) GetBigInt() *BigInt { return a.Value.(*BigInt) }
 
-// MARK - AnyArray
-
 type AnyArray struct {
 	inter.AnyArray[*Any]
 }
@@ -81,8 +61,6 @@ type AnyArray struct {
 func NewAnyArray() *AnyArray {
 	return &AnyArray{[]*Any{}}
 }
-
-// MARK - AnyMap
 
 type AnyMap struct {
 	inter.AnyMap[string, *Any]

@@ -57,10 +57,8 @@ func CreateNewWalletByMnemonic() (mnemonic, priKey, address string, err error) {
 }
 
 func SignText(privateKeyHex, message string) (string, error) {
-	// Ensure the private key is in the correct format
-	if strings.HasPrefix(privateKeyHex, "0x") {
-		privateKeyHex = privateKeyHex[2:]
-	}
+	privateKeyHex = strings.TrimPrefix(privateKeyHex, "0x")
+	privateKeyHex = strings.TrimPrefix(privateKeyHex, "0X")
 
 	// Decode the hex string to a byte slice
 	privateKeyBytes, err := hex.DecodeString(privateKeyHex)

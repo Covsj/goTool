@@ -161,7 +161,7 @@ func (e *EthChain) SdkBatchTransactionStatus(hashListString string) string {
 	return strings.Join(statuses, ",")
 }
 
-// 根据交易hash查询交易状态
+// TransactionByHash 根据交易hash查询交易状态
 // TO-DO  返回更详细的信息，解析交易余额，交易动作
 func (e *EthChain) TransactionByHash(txHash string) (*TransactionByHashResult, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), e.timeout)
@@ -195,7 +195,7 @@ func (e *EthChain) TransactionByHash(txHash string) (*TransactionByHashResult, e
 	}, nil
 }
 
-// TransactionReceipt 是指交易的收据，每笔交易执行完
+// TransactionReceiptByHash 是指交易的收据，每笔交易执行完
 // 会产生一个收据，收据中包含交易的状态，交易的gas使用情况，交易执行是否成功的状态码等信息
 // 交易收据属性列表：
 // gasUsed: 交易执行时使用的gas数量
@@ -239,7 +239,6 @@ func (e *EthChain) WaitConfirm(txHash string, interval time.Duration) *Receipt {
 	return nil
 }
 
-// customReceipt is inherit from eth/core types.Receipt, and added some necessary properties
 type Receipt struct {
 	types.Receipt
 
