@@ -29,7 +29,7 @@ func (e *EthChain) buildTx(
 	opts *CallMethodOpts) (*BuildTxResult, error) {
 	var rawTx *types.Transaction
 
-	optsBigInt := OptsTobigInt(opts)
+	optsBigInt := OptsTobiInt(opts)
 
 	if optsBigInt.MaxPriorityFeePerGas == nil {
 		var gasPrice *big.Int = nil
@@ -90,7 +90,7 @@ func (e *EthChain) BuildTransferTx(privateKey, toAddress string, opts *CallMetho
 	toAddressObj := common.HexToAddress(toAddress)
 	privateKeyBuf, err := hex.DecodeString(privateKey)
 
-	optsBigInt := OptsTobigInt(opts)
+	optsBigInt := OptsTobiInt(opts)
 	if err != nil {
 		return nil, err
 	}
@@ -143,7 +143,7 @@ func (e *EthChain) BuildCallMethodTx(
 		return nil, err
 	}
 
-	optsBigInt := OptsTobigInt(opts)
+	optsBigInt := OptsTobiInt(opts)
 
 	var value = big.NewInt(0)
 	var gasLimit uint64 = 0
@@ -180,7 +180,7 @@ func (e *EthChain) BuildCallMethodTx(
 
 	amountBigInt, _ := new(big.Int).SetString(erc20TxParams.Amount, 10)
 
-	if methodName == ERC20_METHOD_TRANSFER || methodName == ERC20_METHOD_APPROVE {
+	if methodName == Erc20MethodTransfer || methodName == Erc20MethodApprove {
 		// 将string地址类型转化为hex类型
 		input, err = parsedAbi.Pack(methodName,
 			common.HexToAddress(erc20TxParams.ToAddress),
@@ -225,7 +225,7 @@ func (e *EthChain) BuildCallMethodTxWithPayload(
 
 	contractAddressObj := common.HexToAddress(contractAddress)
 
-	optsBigInt := OptsTobigInt(opts)
+	optsBigInt := OptsTobiInt(opts)
 
 	var value = big.NewInt(0)
 	var gasLimit uint64 = 0

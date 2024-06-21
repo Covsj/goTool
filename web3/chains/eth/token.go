@@ -35,7 +35,6 @@ func (t *Token) Chain() basic.Chain {
 	return t.chain
 }
 
-// Warning: Main token does not support
 func (t *Token) TokenInfo() (*basic.TokenInfo, error) {
 	return nil, errors.New("Main token does not support")
 }
@@ -51,8 +50,6 @@ func (t *Token) BalanceOfPublicKey(publicKey string) (*basic.Balance, error) {
 func (t *Token) BalanceOfAccount(account basic.Account) (*basic.Balance, error) {
 	return t.BalanceOfAddress(account.Address())
 }
-
-// MARK - Eth TokenProtocol
 
 func (t *Token) EstimateGasLimit(fromAddress, receiverAddress, gasPrice, amount string) (string, error) {
 	msg := NewCallMsg()
@@ -75,6 +72,24 @@ func (t *Token) BuildTransferTx(privateKey string, transaction *Transaction) (*b
 		return nil, err
 	}
 	return t.chain.buildTransfer(privateKeyECDSA, transaction)
+}
+
+func (t *Token) TransferETHWithAccount(from *Account, toAddress, amount string) (string, error) {
+
+	chain := NewChainWithRpc(t.chain.RpcUrl)
+	gasPrice, err := chain.SuggestGasPrice()
+	if err != nil {
+		return "", err
+	}
+	token := chain.MainEthToken()
+	gasLimit, err := token.EstimateGasLimit(from.Address(), toAddress, gasPrice.Value, amount)
+	if err != nil {
+		return "", err
+	}
+
+	transaction := NewTransaction("", gasPrice.Value, gasLimit, toAddress, amount, "")
+	signedTx, err := token.BuildTransferTxWithAccount(from, transaction)
+	return chain.SendRawTransaction(signedTx.Value)
 }
 
 func (t *Token) BuildTransferTxWithAccount(account *Account, transaction *Transaction) (*basic.OptionalString, error) {

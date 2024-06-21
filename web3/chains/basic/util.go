@@ -2,14 +2,10 @@ package basic
 
 import (
 	"errors"
-	"fmt"
-	"hash/fnv"
 	"math/big"
 	"strconv"
 	"strings"
 	"sync"
-
-	"github.com/tyler-smith/go-bip39"
 )
 
 // MapListConcurrent 多协程转换数据
@@ -195,37 +191,4 @@ func BigIntMultiply(b *big.Int, ratio float64) *big.Int {
 	product := f1.Mul(f1, big.NewFloat(ratio))
 	res, _ := product.Int(big.NewInt(0))
 	return res
-}
-
-// CalculateLastWord 根据传入的11个助记词，计算最后助记词
-func CalculateLastWord(mnemonicWords []string) (string, error) {
-	if len(mnemonicWords) != 11 {
-		return "", errors.New("mnemonicWords not 11 length")
-	}
-	// found own morning
-	wordList := bip39.GetWordList()
-	m := []string{}
-	for _, word := range wordList {
-		mnemonic := fmt.Sprintf("%s %s", strings.Join(mnemonicWords, " "), word)
-		if bip39.IsMnemonicValid(mnemonic) {
-			m = append(m, word)
-		}
-	}
-
-	if len(m) <= 0 {
-		return "", errors.New("not found")
-	}
-	stringToNumber := func(str string, length int) int {
-		h := fnv.New32a()
-		_, err := h.Write([]byte(str))
-		if err != nil {
-			return 0
-		}
-		hashValue := h.Sum32()
-		number := int(hashValue) % length
-		return number
-	}
-	index := stringToNumber(mnemonicWords[len(mnemonicWords)-2]+mnemonicWords[len(mnemonicWords)-1], len(m))
-	mnemonic := fmt.Sprintf("%s %s", strings.Join(mnemonicWords, " "), m[index])
-	return mnemonic, nil
 }

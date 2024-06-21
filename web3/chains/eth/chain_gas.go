@@ -111,7 +111,7 @@ func (c *Chain) EstimateGasLimit(msg *CallMsg) (gas *basic.OptionalString, err e
 		// any contract transaction
 		gas = &basic.OptionalString{Value: DEFAULT_CONTRACT_GAS_LIMIT}
 	} else {
-		// nomal transfer
+		// normal transfer
 		gas = &basic.OptionalString{Value: DEFAULT_ETH_GAS_LIMIT}
 	}
 

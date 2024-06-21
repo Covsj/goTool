@@ -1,8 +1,10 @@
 package eth
 
 const (
-	ERC20_METHOD_TRANSFER = "transfer"
-	ERC20_METHOD_APPROVE  = "approve"
+	Erc20MethodTransfer  = "transfer"
+	Erc20MethodApprove   = "approve"
+	Erc20MethodBalanceOf = "balanceOf"
+	Erc20MethodDecimals  = "decimals"
 )
 
 // 默认gas limit估算失败后，21000 * 3 = 63000

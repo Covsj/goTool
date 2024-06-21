@@ -49,7 +49,7 @@ func (c *Chain) BalanceOfAddress(address string) (*basic.Balance, error) {
 	b := basic.NewBalance("0")
 
 	if !IsValidAddress(address) {
-		return b, errors.New("Invalid hex address")
+		return b, errors.New("invalid hex address")
 	}
 
 	chain, err := GetConnection(c.RpcUrl)
@@ -61,8 +61,8 @@ func (c *Chain) BalanceOfAddress(address string) (*basic.Balance, error) {
 		return b, err
 	}
 	return &basic.Balance{
-		Total:  balance,
-		Usable: balance,
+		Total:            balance,
+		TotalWithDecimal: balance,
 	}, nil
 }
 
@@ -97,7 +97,7 @@ func (c *Chain) FetchTransactionDetail(hash string) (*basic.TransactionDetail, e
 	}
 	if data := txn.Data(); len(data) > 0 {
 		method, params, err := DecodeContractParams(Erc20AbiStr, data)
-		if err == nil && method == ERC20_METHOD_TRANSFER {
+		if err == nil && method == Erc20MethodTransfer {
 			detail.ToAddress = params[0].(common.Address).String()
 			detail.Amount = params[1].(*big.Int).String()
 		}

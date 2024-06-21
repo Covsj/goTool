@@ -55,14 +55,14 @@ func (e *EthChain) Erc20TokenInfo(contractAddress string, walletAddress string) 
 // TokenBalance 返回erc20代币余额
 func (e *EthChain) TokenBalance(contractAddress, address string) (string, error) {
 	if len(contractAddress) == 0 || len(address) == 0 {
-		return "0", errors.New("The address of the contract or wallet is empty.")
+		return "0", errors.New("the address of the contract or wallet is empty")
 	}
 	result := new(big.Int)
 	err := e.CallContractConstant(
 		&result,
 		contractAddress,
 		Erc20AbiStr,
-		"balanceOf",
+		Erc20MethodBalanceOf,
 		nil,
 		common.HexToAddress(address),
 	)
@@ -80,7 +80,7 @@ func (e *EthChain) TokenDecimal(contractAddress string) (int16, error) {
 		&decimal,
 		contractAddress,
 		Erc20AbiStr,
-		"decimals",
+		Erc20MethodDecimals,
 		nil,
 	)
 	if err != nil {

@@ -18,13 +18,11 @@ type Erc20TokenInfo struct {
 	ChainId         string
 	TokenIcon       string
 
-	// Deprecated: Balance is not a token's info.
 	Balance string
 }
 
 type Erc20Token struct {
 	*Token
-
 	ContractAddress string
 }
 
@@ -35,9 +33,6 @@ func NewErc20Token(chain *Chain, contractAddress string) *Erc20Token {
 	}
 }
 
-// MARK - Implement the protocol Token, Override
-
-// cannot get balance
 func (t *Erc20Token) Erc20TokenInfo() (*Erc20TokenInfo, error) {
 	chain, err := GetConnection(t.chain.RpcUrl)
 	if err != nil {
@@ -97,8 +92,8 @@ func (t *Erc20Token) BalanceOfAddress(address string) (*basic.Balance, error) {
 		return b, err
 	}
 	return &basic.Balance{
-		Total:  balance,
-		Usable: balance,
+		Total:            balance,
+		TotalWithDecimal: balance,
 	}, nil
 }
 
@@ -140,6 +135,36 @@ func (t *Erc20Token) BuildTransferTx(privateKey string, transaction *Transaction
 	return t.buildTransfer(privateKeyECDSA, transaction)
 }
 
+func (t *Erc20Token) Transfer(account *Account, toAddress, amount string) (string, error) {
+	err := errors.New("transfer failed")
+	transferData, err := EncodeErc20Transfer(toAddress, amount)
+	if err != nil {
+		return "", err
+	}
+	gasPrice, err := t.chain.SuggestGasPrice()
+	if err != nil {
+		return "", err
+	}
+	msg := NewCallMsg()
+	msg.SetFrom(account.Address())
+	msg.SetTo(t.ContractAddress)
+	msg.SetGasPrice(gasPrice.Value)
+	msg.SetData(transferData)
+	msg.SetValue("0")
+	gasLimit, err := t.chain.EstimateGasLimit(msg)
+	if err != nil {
+		gasLimit = &basic.OptionalString{Value: "100000"}
+		err = nil
+	}
+	msg.SetGasLimit(gasLimit.Value)
+	transaction := msg.TransferToTransaction()
+	rawTx, err := t.chain.buildTransfer(account.privateKeyECDSA, transaction)
+	if err != nil {
+		return "", err
+	}
+	return t.chain.SendRawTransaction(rawTx.Value)
+}
+
 func (t *Erc20Token) BuildTransferTxWithAccount(account *Account, transaction *Transaction) (*basic.OptionalString, error) {
 	return t.buildTransfer(account.privateKeyECDSA, transaction)
 }
@@ -168,7 +193,7 @@ func (t *Erc20Token) Allowance(owner, spender string) (*big.Int, error) {
 }
 
 func (t *Erc20Token) Approve(account *Account, spender string, amount *big.Int) (string, error) {
-	err := errors.New("Approve failed")
+	err := errors.New("approve failed")
 
 	approveData, err := EncodeErc20Approve(spender, amount)
 	if err != nil {

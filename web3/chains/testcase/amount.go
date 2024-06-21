@@ -13,6 +13,7 @@ func (a Amount) Int64() int64 {
 func (a Amount) Uint64() uint64 {
 	return uint64(a.Amount * a.Multiple)
 }
+
 func (a Amount) String() string {
 	return strconv.FormatUint(uint64(a.Amount*a.Multiple), 10)
 }

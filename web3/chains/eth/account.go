@@ -3,6 +3,7 @@ package eth
 import (
 	"crypto/ecdsa"
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/Covsj/goTool/web3/chains/basic"
@@ -58,9 +59,9 @@ func NewAccountWithMnemonic(mnemonic string) (*Account, error) {
 	}, nil
 }
 
-func NewAccountWithMnemonicIndex(mnemonic string, accountIndex string) (*Account, error) {
-	if accountIndex == "" {
-		accountIndex = "0"
+func NewAccountWithMnemonicIndex(mnemonic string, accountIndex int) (*Account, error) {
+	if accountIndex < 0 {
+		accountIndex = 0
 	}
 
 	seed, err := bip39.NewSeedWithErrorChecking(mnemonic, "")
@@ -73,7 +74,7 @@ func NewAccountWithMnemonicIndex(mnemonic string, accountIndex string) (*Account
 		return nil, err
 	}
 
-	path, err := accounts.ParseDerivationPath("m/44'/60'/0'/0/" + accountIndex)
+	path, err := accounts.ParseDerivationPath("m/44'/60'/0'/0/" + strconv.Itoa(accountIndex))
 	if err != nil {
 		return nil, err
 	}

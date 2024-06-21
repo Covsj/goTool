@@ -9,6 +9,7 @@ import (
 func ETH(amount float64) testcase.Amount {
 	return testcase.Amount{Amount: amount, Multiple: 1e18}
 }
+
 func Gwei(amount float64) testcase.Amount {
 	return testcase.Amount{Amount: amount, Multiple: 1e9}
 }

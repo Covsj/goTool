@@ -63,7 +63,7 @@ func (e *EthChain) EstimateContractGasLimit(
 
 	amountBigInt, _ := new(big.Int).SetString(erc20TxParams.Amount, 10)
 
-	if methodName == ERC20_METHOD_TRANSFER || methodName == ERC20_METHOD_APPROVE {
+	if methodName == Erc20MethodTransfer || methodName == Erc20MethodApprove {
 		// 将string地址类型转化为hex类型
 		input, err = parsedAbi.Pack(methodName,
 			common.HexToAddress(erc20TxParams.ToAddress),
@@ -138,7 +138,7 @@ func (e *EthChain) EstimateGasLimit(fromAddress string, receiverAddress string, 
 	if err != nil {
 		return
 	}
-	input, err := parsedAbi.Pack(ERC20_METHOD_TRANSFER, common.HexToAddress(receiverAddress), amountBigInt)
+	input, err := parsedAbi.Pack(Erc20MethodTransfer, common.HexToAddress(receiverAddress), amountBigInt)
 	if err != nil {
 		return
 	}

@@ -19,7 +19,7 @@ func TestToken_BuildTransfer_SignedTransaction(t *testing.T) {
 	balance, err := token.BalanceOfAddress(account.Address())
 	require.Nil(t, err)
 	t.Log("sender address = ", account.Address())
-	t.Log("balance = ", balance.Usable)
+	t.Log("balance = ", balance.TotalWithDecimal)
 
 	txn, err := token.BuildTransfer(account.Address(), account.Address(), "100")
 	require.Nil(t, err)
