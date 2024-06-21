@@ -14,13 +14,13 @@ func TestCreateNewWalletByMnemonic(t *testing.T) {
 }
 
 func TestConvertStringToBigInt(t *testing.T) {
-	resBigInt, err := ConvertStringToBigInt("0.1", 18)
+	resBigInt, err := BalanceStringToBigInt("0.1", 18)
 	if err != nil {
 		fmt.Println(err.Error())
 		return
 	}
 	fmt.Println(resBigInt.String())
 
-	toString := ConvertBigIntToString(resBigInt, 18)
+	toString := BalanceBigIntToString(resBigInt, 18)
 	fmt.Println(toString)
 }

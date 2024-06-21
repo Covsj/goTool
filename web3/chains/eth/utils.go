@@ -214,7 +214,7 @@ func SignText(privateKeyHex, message string) (string, error) {
 	return hexutil.Encode(signature), nil
 }
 
-func ConvertBigIntToString(balance *big.Int, decimals uint8) string {
+func BalanceBigIntToString(balance *big.Int, decimals uint8) string {
 	if decimals == 0 {
 		decimals = 18
 	}
@@ -236,7 +236,7 @@ func ConvertBigIntToString(balance *big.Int, decimals uint8) string {
 	return balanceStr
 }
 
-func ConvertStringToBigInt(balanceStr string, decimals uint8) (*big.Int, error) {
+func BalanceStringToBigInt(balanceStr string, decimals uint8) (*big.Int, error) {
 	if decimals == 0 {
 		decimals = 18
 	}
