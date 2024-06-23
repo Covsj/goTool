@@ -1,9 +1,7 @@
 package basic
 
 import (
-	"fmt"
 	"strconv"
-	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -50,11 +48,4 @@ func TestNFTImage(t *testing.T) {
 	res, err := ExtractNFTImageUrl(url)
 	require.Nil(t, err)
 	t.Log(res)
-}
-
-func TestCalculateLastWord(t *testing.T) {
-	str := `apple trigger skill toast machine wave pact black remain poverty slot`
-	word, err := CalculateLastWord(strings.Split(str, " ")[:11])
-	fmt.Println(word, err)
-
 }

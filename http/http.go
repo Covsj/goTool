@@ -142,7 +142,6 @@ func Execute(req *http.Request, cli *http.Client) (*http.Response, error) {
 	}
 	resp, err := cli.Do(req)
 	if err != nil {
-		fmt.Println(fmt.Errorf("failed to execute request: %w", err).Error())
 		return nil, fmt.Errorf("failed to execute request: %w", err)
 	}
 	return resp, nil
@@ -176,7 +175,7 @@ func Send(opts *RequestOptions) (*http.Response, []byte, error) {
 	}
 	resp, err := Execute(req, cli)
 	if err != nil {
-		return resp, nil, err
+		return nil, nil, err
 	}
 	defer func() {
 		if resp != nil && resp.Body != nil {

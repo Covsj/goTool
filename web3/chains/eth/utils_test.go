@@ -2,6 +2,7 @@ package eth
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 )
 
@@ -23,4 +24,10 @@ func TestConvertStringToBigInt(t *testing.T) {
 
 	toString := BalanceBigIntToString(resBigInt, 18)
 	fmt.Println(toString)
+}
+
+func TestCalculateLastWord(t *testing.T) {
+	str := `apple trigger skill toast machine wave pact black remain poverty slot`
+	word, err := CalculateLastWord(strings.Split(str, " ")[:11])
+	fmt.Println(word, err)
 }

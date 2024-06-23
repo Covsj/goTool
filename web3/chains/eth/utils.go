@@ -154,7 +154,7 @@ func CalculateLastWord(mnemonicWords []string) (string, error) {
 	}
 	// found own morning
 	wordList := bip39.GetWordList()
-	m := []string{}
+	var m []string
 	for _, word := range wordList {
 		mnemonic := fmt.Sprintf("%s %s", strings.Join(mnemonicWords, " "), word)
 		if bip39.IsMnemonicValid(mnemonic) {
