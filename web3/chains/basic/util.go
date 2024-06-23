@@ -8,26 +8,10 @@ import (
 	"sync"
 )
 
-// This method will traverse the array concurrently and map each object in the array.
-// @param list: [TYPE1], a list that all item is TYPE1
-// @param limit: maximum number of tasks to execute, 0 means no limit
-// @param maper: func(TYPE1) (TYPE2, error), a function that input TYPE1, return TYPE2
-//
-//	you can throw an error to finish task.
-//
-// @return : [TYPE2], a list that all item is TYPE2
-// @example : ```
-//
-//	nums := []interface{}{1, 2, 3, 4, 5, 6}
-//	res, _ := MapListConcurrent(nums, func(i interface{}) (interface{}, error) {
-//	    return strconv.Itoa(i.(int) * 100), nil
-//	})
-//	println(res) // ["100" "200" "300" "400" "500" "600"]
-//
-// ```
-func MapListConcurrent(list []interface{}, limit int, maper func(interface{}) (interface{}, error)) ([]interface{}, error) {
+// MapListConcurrent 多协程转换数据
+func MapListConcurrent(list []interface{}, threads int, fn func(interface{}) (interface{}, error)) ([]interface{}, error) {
 	thread := 0
-	max := limit
+	max := threads
 	wg := sync.WaitGroup{}
 
 	mapContainer := newSafeMap()
@@ -50,11 +34,11 @@ func MapListConcurrent(list []interface{}, limit int, maper func(interface{}) (i
 		}
 
 		go func(w *sync.WaitGroup, item interface{}, mapContainer *safeMap, firstError *error) {
-			maped, err := maper(item)
+			res, err := fn(item)
 			if *firstError == nil && err != nil {
 				*firstError = err
 			} else {
-				mapContainer.writeMap(item, maped)
+				mapContainer.writeMap(item, res)
 			}
 			wg.Done()
 		}(&wg, item, mapContainer, &firstError)
@@ -72,14 +56,14 @@ func MapListConcurrent(list []interface{}, limit int, maper func(interface{}) (i
 	return result, nil
 }
 
-// MapListConcurrentStringToString The encapsulation of MapListConcurrent.
-func MapListConcurrentStringToString(strList []string, maper func(string) (string, error)) ([]string, error) {
+// MapListConcurrentStringToString 多协程转换字符串数据,默认10协程
+func MapListConcurrentStringToString(strList []string, fn func(string) (string, error)) ([]string, error) {
 	list := make([]interface{}, len(strList))
 	for i, s := range strList {
 		list[i] = s
 	}
 	temp, err := MapListConcurrent(list, 10, func(i interface{}) (interface{}, error) {
-		return maper(i.(string))
+		return fn(i.(string))
 	})
 	if err != nil {
 		return nil, err
@@ -92,7 +76,6 @@ func MapListConcurrentStringToString(strList []string, maper func(string) (strin
 	return result, nil
 }
 
-// MaxBigInt Return the more big of the two numbers
 func MaxBigInt(x, y *big.Int) *big.Int {
 	if x.Cmp(y) > 0 {
 		return x
@@ -101,7 +84,6 @@ func MaxBigInt(x, y *big.Int) *big.Int {
 	}
 }
 
-// Max @note float64 should use `math.Max()`
 func Max[T int | int8 | int16 | int32 | int64 | uint | uint8 | uint16 | uint32 | uint64 | float32 | string](x, y T) T {
 	if x >= y {
 		return x
@@ -110,7 +92,6 @@ func Max[T int | int8 | int16 | int32 | int64 | uint | uint8 | uint16 | uint32 |
 	}
 }
 
-// Min @note float64 should use `math.Min()`
 func Min[T int | int8 | int16 | int32 | int64 | uint | uint8 | uint16 | uint32 | uint64 | float32 | string](x, y T) T {
 	if x <= y {
 		return x

@@ -34,12 +34,8 @@ func (a *BlockScout) Nft(owner string, nextPage *BKSPageParams) (page *BKSNFTPag
 		url = url + "?" + nextPage.String()
 	}
 
-	data, err := httpUtil.Get(url, nil)
-	if err != nil {
-		return
-	}
 	var rawPage bksRawItemsPage[*BKSNFT]
-	err = json.Unmarshal(data, &rawPage)
+	err = httpUtil.Get(url, nil, &rawPage)
 	if err != nil {
 		return
 	}

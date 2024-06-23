@@ -184,7 +184,7 @@ func TestAccountWithPrivateKey(t *testing.T) {
 	privateKey, err := accountFromMnemonic.PrivateKeyHex()
 	require.Nil(t, err)
 
-	accountFromPrikey, err := AccountWithPrivateKey(privateKey)
+	accountFromPrikey, err := NewAccountWithPrivateKey(privateKey)
 	require.Nil(t, err)
 
 	require.Equal(t, accountFromMnemonic.Address(), accountFromPrikey.Address())

@@ -16,23 +16,17 @@ func NewUtil() *Util {
 	return &Util{}
 }
 
-// MARK - Implement the protocol wallet.Util
-
 func (u *Util) EncodePublicKeyToAddress(publicKey string) (string, error) {
 	return EncodePublicKeyToAddress(publicKey)
 }
 
-// DecodeAddressToPublicKey Warning: eth cannot support decode address to public key
 func (u *Util) DecodeAddressToPublicKey(address string) (string, error) {
 	return "", errors.New("eth cannot support decode address to public key")
 }
 
-// IsValidAddress Check if address is 40 hexadecimal characters
 func (u *Util) IsValidAddress(address string) bool {
 	return IsValidAddress(address)
 }
-
-// MARK - like wallet.Util
 
 func EncodePublicKeyToAddress(publicKey string) (string, error) {
 	bytes, err := types.HexDecodeString(publicKey)
@@ -47,17 +41,14 @@ func EncodePublicKeyToAddress(publicKey string) (string, error) {
 	return address.String(), nil
 }
 
-// DecodeAddressToPublicKey Warning: eth cannot support decode address to public key
 func DecodeAddressToPublicKey(address string) (string, error) {
 	return "", errors.New("eth cannot support decode address to public key")
 }
 
-// IsValidAddress Check if address is 40 hexadecimal characters
 func IsValidAddress(address string) bool {
 	return common.IsHexAddress(address)
 }
 
-// IsValidEIP55Address It will check based on eip55 rules
 func IsValidEIP55Address(address string) bool {
 	if !IsValidAddress(address) {
 		return false

@@ -1,7 +1,3 @@
-//Copy from https://github.com/ethereum/go-ethereum/blob/master/mobile/big.go
-
-// Contains all the wrappers from the math/big package.
-
 package basic
 
 import (

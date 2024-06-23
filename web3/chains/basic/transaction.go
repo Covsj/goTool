@@ -10,9 +10,7 @@ type Transaction interface {
 	SignedTransactionWithAccount(account Account) (signedTxn SignedTransaction, err error)
 }
 
-// SignedTransaction can use chain to broadcast transactions, `chain.SendSignedTransaction(signedTxn)`
 type SignedTransaction interface {
-	// Hex string can use chain to broadcast transactions, `chain.SendRawTransaction(txString)`
 	HexString() (res *OptionalString, err error)
 }
 
@@ -25,39 +23,37 @@ const (
 	TransactionStatusFailure TransactionStatus = 3
 )
 
-// TransactionDetail Transaction details that can be fetched from the chain
 type TransactionDetail struct {
-	// hash string on chain
+	// 哈希字符串
 	HashString string
 
-	// transaction amount
+	// 交易数量
 	Amount string
 
 	EstimateFees string
 
-	// sender's address
+	// 发送地址
 	FromAddress string
-	// receiver's address
+	// 接收地址
 	ToAddress string
 
+	// 交易状态
 	Status TransactionStatus
-	// transaction completion timestamp (s), 0 if Status is in Pending
+	// 完成时间戳，如果是Pending状态则是0
 	FinishTimestamp int64
-	// failure message
+	// 失败信息
 	FailureMessage string
 
-	// If this transaction is a CID transfer, its value will be the CID, otherwise it is empty
+	// 如果此交易是 CID 转账，则其值将为 CID，否则为空
 	CIDNumber string
-	// If this transaction is a NFT transfer, its value will be the Token name, otherwise it is empty
+	// 如果此交易是 NFT 转账，其值将为 Token 名称，否则为空
 	TokenName string
 }
 
-// IsCIDTransfer Check the `CIDNumber` is not empty.
 func (d *TransactionDetail) IsCIDTransfer() bool {
 	return strings.TrimSpace(d.CIDNumber) != ""
 }
 
-// IsNFTTransfer Check the `TokenName` is not empty.
 func (d *TransactionDetail) IsNFTTransfer() bool {
 	return strings.TrimSpace(d.TokenName) != ""
 }

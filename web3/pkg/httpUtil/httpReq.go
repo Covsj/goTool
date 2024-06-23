@@ -3,13 +3,15 @@ package httpUtil
 import (
 	"bytes"
 	"context"
-	"errors"
 	"fmt"
 	"io"
 	"net/http"
 	"net/url"
 	"sync"
 	"time"
+
+	localhttp "github.com/Covsj/goTool/http"
+	"github.com/Covsj/goTool/log"
 )
 
 var (
@@ -30,7 +32,7 @@ type RequestParams struct {
 	Timeout time.Duration
 }
 
-func Get(baseUrl string, param map[string]string) (body []byte, err error) {
+func Get(baseUrl string, param map[string]string, out interface{}) (err error) {
 	urlPath := baseUrl
 	if len(param) != 0 {
 		params := url.Values{}
@@ -39,21 +41,18 @@ func Get(baseUrl string, param map[string]string) (body []byte, err error) {
 		}
 		httpUrl, err := url.Parse(baseUrl)
 		if err != nil {
-			return nil, err
+			return err
 		}
 		httpUrl.RawQuery = params.Encode()
 		urlPath = httpUrl.String()
 	}
 
-	resp, err := http.Get(urlPath)
-	if resp == nil {
-		return nil, err
+	resp, body, err := localhttp.Get(urlPath, out)
+	if err != nil {
+		log.Error("请求失败", "url", urlPath, "error", err, "body", string(body), "resp", &resp)
+		return err
 	}
-	defer resp.Body.Close()
-	if resp.StatusCode != 200 {
-		return nil, errors.New("get " + baseUrl + " response code = " + resp.Status)
-	}
-	return io.ReadAll(resp.Body)
+	return nil
 }
 
 func Post(url string, params RequestParams) ([]byte, error) {

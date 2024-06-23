@@ -18,25 +18,25 @@ type GasPrice struct {
 	MaxFee         string
 }
 
-// MaxPriorityFee = SuggestPriorityFee * 1.0
+// UseLow MaxPriorityFee = SuggestPriorityFee * 1.0
 // MaxFee = (MaxPriorityFee + BaseFee) * 1.0
 func (g *GasPrice) UseLow() *GasPrice {
 	return g.UseRate(1.0, 1.0)
 }
 
-// MaxPriorityFee = SuggestPriorityFee * 1.5
+// UseAverage MaxPriorityFee = SuggestPriorityFee * 1.5
 // MaxFee = (MaxPriorityFee + BaseFee) * 1.11
 func (g *GasPrice) UseAverage() *GasPrice {
 	return g.UseRate(1.5, 1.11)
 }
 
-// MaxPriorityFee = SuggestPriorityFee * 2.0
+// UseHigh MaxPriorityFee = SuggestPriorityFee * 2.0
 // MaxFee = (MaxPriorityFee + BaseFee) * 1.5
 func (g *GasPrice) UseHigh() *GasPrice {
 	return g.UseRate(2.0, 1.5)
 }
 
-// MaxPriorityFee = SuggestPriorityFee * priorityRate
+// UseRate MaxPriorityFee = SuggestPriorityFee * priorityRate
 // MaxFee = (MaxPriorityFee + BaseFee) * maxFeeRate
 func (g *GasPrice) UseRate(priorityRate, maxFeeRate float64) *GasPrice {
 	suggestPriorityFloat, ok := big.NewFloat(0).SetString(g.SuggestPriorityFee)
@@ -61,7 +61,7 @@ func (g *GasPrice) UseRate(priorityRate, maxFeeRate float64) *GasPrice {
 	}
 }
 
-// The gas price use average grade default.
+// SuggestGasPriceEIP1559 The gas price use average grade default.
 func (c *Chain) SuggestGasPriceEIP1559() (*GasPrice, error) {
 	client, err := GetConnection(c.RpcUrl)
 	if err != nil {
@@ -111,7 +111,7 @@ func (c *Chain) EstimateGasLimit(msg *CallMsg) (gas *basic.OptionalString, err e
 		// any contract transaction
 		gas = &basic.OptionalString{Value: DEFAULT_CONTRACT_GAS_LIMIT}
 	} else {
-		// nomal transfer
+		// normal transfer
 		gas = &basic.OptionalString{Value: DEFAULT_ETH_GAS_LIMIT}
 	}
 

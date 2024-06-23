@@ -32,7 +32,7 @@ func TestSdkBatch(t *testing.T) {
 	e, _ := NewEthChain().CreateRemote(rpcs.binanceTest.url)
 	contract := "0xed24fc36d5ee211ea25a80239fb8c4cfd80f12ee"
 	address := "0xed24fc36d5ee211ea25a80239fb8c4cfd80f12ee"
-	result, err := e.SdkBatchTokenBalance(contract, address)
+	result, err := e.SdkBatchTokenBalance([]string{contract}, address)
 	if err != nil {
 		t.Fatal(err)
 	}
