@@ -1,6 +1,7 @@
 package crypto
 
 import (
+	"os"
 	"strings"
 )
 
@@ -12,7 +13,7 @@ type CaesarUtil struct {
 }
 
 var (
-	DefaultCustomCharset = "jk&lmx7def0opq2rs1tu12*3458nvw9abc#$gh2iyz+!=~"
+	DefaultCustomCharset = os.Getenv("DefaultCustomCharset")
 	DefaultOffset        = 13
 )
 

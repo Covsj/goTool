@@ -73,6 +73,5 @@ func TransformEIP55Address(address string) string {
 			}
 		}
 	}
-
 	return "0x" + string(addressBytes)
 }
