@@ -58,7 +58,7 @@ func (c *Chain) BalanceOfAddress(address string) (*basic.Balance, error) {
 		return nil, err
 	}
 	b := strconv.FormatUint(balance, 10)
-	return &basic.Balance{Total: b, TotalWithDecimal: b}, nil
+	return &basic.Balance{Total: b, Decimal: 18}, nil
 }
 func (c *Chain) BalanceOfPublicKey(publicKey string) (*basic.Balance, error) {
 	address, err := EncodePublicKeyToAddress(publicKey)

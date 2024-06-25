@@ -48,9 +48,9 @@ func (t *Src20Token) BalanceOfAddress(address string) (*basic.Balance, error) {
 		return nil, err
 	}
 	if len(tokens) <= 0 {
-		return basic.NewBalance("0"), nil
+		return basic.NewBalance("0", 18), nil
 	}
-	return basic.NewBalance(tokens[0].Amount), nil
+	return basic.NewBalance(tokens[0].Amount, 18), nil
 }
 func (t *Src20Token) BalanceOfPublicKey(publicKey string) (*basic.Balance, error) {
 	return t.BalanceOfAddress(publicKey)

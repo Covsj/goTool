@@ -109,10 +109,10 @@ func (c *Chain) EstimateGasLimit(msg *CallMsg) (gas *basic.OptionalString, err e
 
 	if len(msg.msg.Data) > 0 {
 		// any contract transaction
-		gas = &basic.OptionalString{Value: DEFAULT_CONTRACT_GAS_LIMIT}
+		gas = &basic.OptionalString{Value: DefaultContractGasLimit}
 	} else {
 		// normal transfer
-		gas = &basic.OptionalString{Value: DEFAULT_ETH_GAS_LIMIT}
+		gas = &basic.OptionalString{Value: DefaultEthGasLimit}
 	}
 
 	client, err := GetConnection(c.RpcUrl)

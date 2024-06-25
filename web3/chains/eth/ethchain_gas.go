@@ -45,7 +45,7 @@ func (e *EthChain) EstimateContractGasLimit(
 	methodName string,
 	erc20JsonParams string) (gas string, err error) {
 	defer basic.CatchPanicAndMapToBasicError(&err)
-	gas = DEFAULT_CONTRACT_GAS_LIMIT
+	gas = DefaultContractGasLimit
 
 	parsedAbi, err := abi.JSON(strings.NewReader(abiStr))
 	if err != nil {
@@ -72,14 +72,14 @@ func (e *EthChain) EstimateContractGasLimit(
 			return
 		}
 	} else {
-		return DEFAULT_CONTRACT_GAS_LIMIT, fmt.Errorf("unsupported method name: %s", methodName)
+		return DefaultContractGasLimit, fmt.Errorf("unsupported method name: %s", methodName)
 	}
 	value := big.NewInt(0)
 
 	// 获取标准 gasprice, 如果失败则使用默认值 20000000000
 	gasPrice, err := e.SuggestGasPrice()
 	if err != nil {
-		gasPrice = DEFAULT_ETH_GAS_PRICE
+		gasPrice = DefaultEthGasPrice
 		err = nil
 	}
 	gasPriceBigInt, _ := new(big.Int).SetString(gasPrice, 10)
@@ -107,7 +107,7 @@ func (e *EthChain) EstimateContractGasLimit(
 
 func (e *EthChain) estimateGasLimit(msg ethereum.CallMsg) (gas string, err error) {
 	defer basic.CatchPanicAndMapToBasicError(&err)
-	gas = DEFAULT_ETH_GAS_LIMIT
+	gas = DefaultEthGasLimit
 
 	ctx, cancel := context.WithTimeout(context.Background(), e.timeout)
 	defer cancel()
@@ -127,7 +127,7 @@ func (e *EthChain) estimateGasLimit(msg ethereum.CallMsg) (gas string, err error
 // @return Estimate gasLimit, is a `String` converted from `Uint64`
 func (e *EthChain) EstimateGasLimit(fromAddress string, receiverAddress string, gasPrice string, amount string) (gas string, err error) {
 	defer basic.CatchPanicAndMapToBasicError(&err)
-	gas = DEFAULT_ETH_GAS_LIMIT
+	gas = DefaultEthGasLimit
 
 	from := common.HexToAddress(fromAddress)
 	contractAddressObj := common.HexToAddress(receiverAddress)
@@ -145,7 +145,7 @@ func (e *EthChain) EstimateGasLimit(fromAddress string, receiverAddress string, 
 
 	price, isNumber := new(big.Int).SetString(gasPrice, 10)
 	if !isNumber {
-		return DEFAULT_ETH_GAS_LIMIT, errors.New("gasPrice is invalid")
+		return DefaultEthGasLimit, errors.New("gasPrice is invalid")
 	}
 
 	msg := ethereum.CallMsg{From: from, To: &contractAddressObj, GasPrice: price, Value: value, Data: input}

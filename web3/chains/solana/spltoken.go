@@ -138,7 +138,7 @@ func (t *SPLToken) BalanceOfAddress(address string) (*basic.Balance, error) {
 	for _, bal := range balances {
 		total.Add(total, big.NewInt(int64(bal.Amount)))
 	}
-	return basic.NewBalance(total.String()), nil
+	return basic.NewBalance(total.String(), 18), nil
 }
 func (t *SPLToken) BalanceOfPublicKey(publicKey string) (*basic.Balance, error) {
 	addr, err := EncodePublicKeyToAddress(publicKey)

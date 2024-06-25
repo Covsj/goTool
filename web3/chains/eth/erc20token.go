@@ -81,7 +81,11 @@ func (t *Erc20Token) Decimal() (int16, error) {
 }
 
 func (t *Erc20Token) BalanceOfAddress(address string) (*basic.Balance, error) {
-	b := basic.NewBalance("0")
+	decimal, err := t.Decimal()
+	if err != nil {
+		return nil, err
+	}
+	b := basic.NewBalance("0", decimal)
 	chain, err := GetConnection(t.chain.RpcUrl)
 	if err != nil {
 		return b, err
@@ -92,8 +96,8 @@ func (t *Erc20Token) BalanceOfAddress(address string) (*basic.Balance, error) {
 		return b, err
 	}
 	return &basic.Balance{
-		Total:            balance,
-		TotalWithDecimal: balance,
+		Total:   balance,
+		Decimal: decimal,
 	}, nil
 }
 

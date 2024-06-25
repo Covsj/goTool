@@ -40,7 +40,7 @@ type ReachMonitor struct {
 
 	reachability RpcReachability
 
-	stoped bool
+	stopped bool
 }
 
 // NewReachMonitorWithReachability You need to pass in different objects to get the latency and block height of different chains.
@@ -60,7 +60,7 @@ func NewReachMonitorWithReachability(reachability RpcReachability) *ReachMonitor
 }
 
 func (r *ReachMonitor) StopConnectivity() {
-	r.stoped = true
+	r.stopped = true
 }
 
 // @param rpcList string of rpcs like "rpc1,rpc2,rpc3,..."
@@ -79,7 +79,7 @@ func (r *ReachMonitor) StartConnectivitySync(rpcList string) string {
 }
 
 func (r *ReachMonitor) startConnectivity(rpcList string, delegate ReachMonitorDelegate) string {
-	r.stoped = false
+	r.stopped = false
 	successCall, successOk := delegate.(interface {
 		ReachabilityDidReceiveNode(tester *ReachMonitor, latency *RpcLatency)
 	})
@@ -99,7 +99,7 @@ func (r *ReachMonitor) startConnectivity(rpcList string, delegate ReachMonitorDe
 		url := i.(string)
 		// The result of the first request may be highly skewed, So we need to request one more time
 		for c := 0; c < r.ReachCount+1; c++ {
-			if r.stoped {
+			if r.stopped {
 				break
 			}
 			latency, err := r.reachability.LatencyOf(url, r.Timeout)
