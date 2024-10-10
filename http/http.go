@@ -19,10 +19,15 @@ type ReqOpt struct {
 	Body                 interface{}
 	FormData             map[string]string
 	EnableForceMultipart bool
+	NeedSkipTls          bool
 }
 
-func DoRequest(opt ReqOpt) (*req.Response, error) {
-	request := defaultClient.R()
+func DoRequest(opt *ReqOpt) (*req.Response, error) {
+	cli := defaultClient
+	if opt.NeedSkipTls {
+		cli.TLSClientConfig.InsecureSkipVerify = true
+	}
+	request := cli.R()
 	if opt.RetryCount != 0 {
 		request = request.SetRetryCount(opt.RetryCount)
 	}
@@ -41,17 +46,19 @@ func DoRequest(opt ReqOpt) (*req.Response, error) {
 	if opt.FormData != nil {
 		request = request.SetFormData(opt.FormData)
 	}
-	if opt.Method == "GET" {
-		return request.Get(opt.Url)
-	} else if opt.Method == "POST" {
-		return request.Post(opt.Url)
-	} else if opt.Method == "PUT" {
-		return request.Put(opt.Url)
-	} else if opt.Method == "DELETE" {
-		return request.Delete(opt.Url)
-	} else if opt.Method == "OPTIONS" {
-		return request.Options(opt.Url)
-	}
 
-	return request.Head(opt.Url)
+	switch opt.Method {
+	case "POST":
+		return request.Post(opt.Url)
+	case "PUT":
+		return request.Put(opt.Url)
+	case "DELETE":
+		return request.Delete(opt.Url)
+	case "OPTIONS":
+		return request.Options(opt.Url)
+	case "HEAD":
+		return request.Head(opt.Url)
+	default:
+		return request.Get(opt.Url)
+	}
 }

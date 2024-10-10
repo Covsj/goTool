@@ -32,9 +32,9 @@ func (cfg *Config) ConfigureEmail(isRand bool, emailName string) (string, error)
 		requestBody = strings.ReplaceAll(`{"em_prefix":"REPLACE_EMAIL"}`, "REPLACE_EMAIL", emailName)
 	}
 
-	resp, body, err := gotool_http.Send(
-		&gotool_http.RequestOptions{
-			URL:     "https://" + cfg.Domain + "/api/mailbox/rand_emprefix",
+	resp, err := gotool_http.DoRequest(
+		&gotool_http.ReqOpt{
+			Url:     "https://" + cfg.Domain + "/api/mailbox/rand_emprefix",
 			Method:  "POST",
 			Body:    requestBody,
 			Headers: map[string]string{"token": cfg.Token},
@@ -43,9 +43,9 @@ func (cfg *Config) ConfigureEmail(isRand bool, emailName string) (string, error)
 	if err != nil || resp.StatusCode != 200 {
 		return "", fmt.Errorf("request failed: %v", err)
 	}
-	fmt.Println(string(body))
+	fmt.Println(resp)
 	response := &SetResponse{}
-	if err := json.Unmarshal(body, response); err != nil {
+	if err := json.Unmarshal(resp.Bytes(), response); err != nil {
 		return "", fmt.Errorf("failed to parse response: %v", err)
 	}
 
@@ -59,9 +59,9 @@ func (cfg *Config) FetchEmails(targetEmail, targetSubject string) ([]Detail, err
 		return emails, errors.New("targetEmail&targetSubject all empty")
 	}
 	for i := 0; i < 5; i++ {
-		resp, body, err := gotool_http.Send(
-			&gotool_http.RequestOptions{
-				URL:     "https://" + cfg.Host + "/api/mailbox/getnewest5",
+		resp, err := gotool_http.DoRequest(
+			&gotool_http.ReqOpt{
+				Url:     "https://" + cfg.Host + "/api/mailbox/getnewest5",
 				Method:  "POST",
 				Headers: map[string]string{"token": cfg.Token},
 			},
@@ -73,7 +73,7 @@ func (cfg *Config) FetchEmails(targetEmail, targetSubject string) ([]Detail, err
 		}
 
 		response := &FetchResponse{}
-		if err := json.Unmarshal(body, response); err != nil {
+		if err := json.Unmarshal(resp.Bytes(), response); err != nil {
 			err = fmt.Errorf("failed to parse response: %v", err)
 			continue
 		}

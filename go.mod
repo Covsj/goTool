@@ -10,7 +10,6 @@ replace github.com/99designs/keyring => github.com/coming-chat/keyring v1.3.0
 
 require (
 	github.com/ChainSafe/go-schnorrkel v1.0.0
-	github.com/PuerkitoBio/goquery v1.10.0
 	github.com/blocto/solana-go-sdk v1.30.0
 	github.com/btcsuite/btcd v0.24.0
 	github.com/btcsuite/btcd/btcec/v2 v2.3.2
@@ -41,7 +40,6 @@ require (
 	github.com/Microsoft/go-winio v0.6.1 // indirect
 	github.com/StackExchange/wmi v1.2.1 // indirect
 	github.com/andybalholm/brotli v1.1.0 // indirect
-	github.com/andybalholm/cascadia v1.3.2 // indirect
 	github.com/bits-and-blooms/bitset v1.10.0 // indirect
 	github.com/btcsuite/btcd/chaincfg/chainhash v1.1.0 // indirect
 	github.com/cloudflare/circl v1.4.0 // indirect
