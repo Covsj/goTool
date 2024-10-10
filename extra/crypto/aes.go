@@ -1,54 +1,86 @@
 package crypto
 
 import (
-	"bytes"
-	"crypto/aes"
-	"crypto/cipher"
-	"encoding/base64"
+	"gitee.com/golang-module/dongle"
+	"strings"
 )
 
-// AesEncryptCBC Aes加密 aesKey 16, 24或者32
-func AesEncryptCBC(origStr string, aesKey []byte) (string, error) {
-	origData := []byte(origStr)
-
-	block, err := aes.NewCipher(aesKey)
-	if err != nil {
-		return "", err
+func NewCipher(mode, padding string, key, iv interface{}) *dongle.Cipher {
+	mode, padding = strings.ToUpper(mode), strings.ToUpper(padding)
+	cipher := dongle.NewCipher()
+	// CBC、ECB、CFB、OFB、CTR
+	switch mode {
+	case "CBC":
+		cipher.SetMode(dongle.CBC)
+	case "ECB":
+		cipher.SetMode(dongle.ECB)
+	case "CFB":
+		cipher.SetMode(dongle.CFB)
+	case "OFB":
+		cipher.SetMode(dongle.OFB)
+	case "CTR":
+		cipher.SetMode(dongle.CTR)
 	}
-	blockSize := block.BlockSize()                                 // 获取秘钥块的长度
-	origData = pkcs5Padding(origData, blockSize)                   // 补全码
-	blockMode := cipher.NewCBCEncrypter(block, aesKey[:blockSize]) // 加密模式
-	encrypted := make([]byte, len(origData))                       // 创建数组
-	blockMode.CryptBlocks(encrypted, origData)                     // 加密
-	toString := base64.StdEncoding.EncodeToString(encrypted)
-	return toString, nil
+	// No、Empty、Zero、PKCS5、PKCS7、AnsiX923、ISO97971
+	switch padding {
+	case "NO":
+		cipher.SetPadding(dongle.No)
+	case "EMPTY":
+		cipher.SetPadding(dongle.Empty)
+	case "ZERO":
+		cipher.SetPadding(dongle.Zero)
+	case "PKCS5":
+		cipher.SetPadding(dongle.PKCS5)
+	case "PKCS7":
+		cipher.SetPadding(dongle.PKCS7)
+	case "ANSIX923":
+		cipher.SetPadding(dongle.AnsiX923)
+	case "ISO97971":
+		cipher.SetPadding(dongle.ISO97971)
+	}
+	// des key 长度必须是 8 字节 iv 长度必须是 8 字节
+	// 3des key 长度必须是 24 iv 长度必须是 8
+	// aes key 长度必须是 16、24 或 32 字节, iv 长度必须是 16 字节，ECB 模式不需要设置 iv
+	cipher.SetKey(key)
+	if iv != nil {
+		cipher.SetIV(iv)
+	}
+	return cipher
 }
 
-// AesDecryptCBC Aes解密
-func AesDecryptCBC(origStr string, aesKey []byte) (string, error) {
-	encrypted, err := base64.StdEncoding.DecodeString(origStr)
-	if err != nil {
-		return "", err
+func AesEncryptData(data interface{}, mode, padding string, aesKey, aesIv interface{}) dongle.Encrypter {
+	cipher := NewCipher(mode, padding, aesKey, aesIv)
+	var encrypter dongle.Encrypter
+	switch v := data.(type) {
+	case string:
+		encrypter = dongle.Encrypt.FromString(v).ByAes(cipher)
+	case []byte:
+		encrypter = dongle.Encrypt.FromBytes(v).ByAes(cipher)
+	default:
+		return encrypter
 	}
-	block, err := aes.NewCipher(aesKey)
-	if err != nil {
-		return "", err
-	}
-	blockSize := block.BlockSize()                                 // 获取秘钥块的长度
-	blockMode := cipher.NewCBCDecrypter(block, aesKey[:blockSize]) // 加密模式
-	decrypted := make([]byte, len(encrypted))                      // 创建数组
-	blockMode.CryptBlocks(decrypted, encrypted)                    // 解密
-	decrypted = pkcs5UnPadding(decrypted)                          // 去除补全码
-	return string(decrypted), nil
-}
-func pkcs5Padding(ciphertext []byte, blockSize int) []byte {
-	padding := blockSize - len(ciphertext)%blockSize
-	padText := bytes.Repeat([]byte{byte(padding)}, padding)
-	return append(ciphertext, padText...)
+	return encrypter
 }
 
-func pkcs5UnPadding(origData []byte) []byte {
-	length := len(origData)
-	unPadding := int(origData[length-1])
-	return origData[:(length - unPadding)]
+func AesDecryptData(encryptedData interface{}, mode, padding string, aesKey, aesIv interface{}, encodingMode string) dongle.Decrypter {
+
+	cipher := NewCipher(mode, padding, aesKey, aesIv)
+
+	encodingMode = strings.ToLower(encodingMode)
+	switch encodingMode {
+	case "raw":
+		return dongle.Decrypt.FromRawString(encryptedData.(string)).ByAes(cipher)
+	case "hex":
+		return dongle.Decrypt.FromHexString(encryptedData.(string)).ByAes(cipher)
+	case "base64":
+		return dongle.Decrypt.FromBase64String(encryptedData.(string)).ByAes(cipher)
+	case "bytes":
+		return dongle.Decrypt.FromRawBytes(encryptedData.([]byte)).ByAes(cipher)
+	case "hex-bytes":
+		return dongle.Decrypt.FromHexBytes(encryptedData.([]byte)).ByAes(cipher)
+	case "base64-bytes":
+		return dongle.Decrypt.FromBase64Bytes(encryptedData.([]byte)).ByAes(cipher)
+	}
+
+	return dongle.Decrypter{}
 }

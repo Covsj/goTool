@@ -6,12 +6,12 @@ import (
 )
 
 func TestHash(t *testing.T) {
-	md5 := Md5("11")
-	fmt.Println(md5)
+	md5 := HashGenerator("hello world", "Sha512-224")
+	fmt.Println(md5.ToHexString())
 
-	encode := Base64Encode(md5)
-	fmt.Println(encode)
-	res, err := Base64decode(encode)
-	fmt.Println(res, err)
-	fmt.Println(res == md5)
+	encode := BaseEncode(md5.ToHexString(), "100")
+	fmt.Println(encode.ToString())
+	decode := BaseDecode(encode.String(), "100")
+	fmt.Println(decode.ToString())
+	fmt.Println(decode.ToString() == md5.ToHexString())
 }

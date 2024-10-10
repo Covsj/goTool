@@ -35,10 +35,10 @@ func (p *CaesarUtil) EncodeKey(str string, encrypt bool) string {
 		customCharset = DefaultCustomCharset
 	}
 
-	aes, err := AesEncryptCBC(Base64Encode(Base32Encode(customCharset)), []byte(Md5(customCharset)))
-	if err != nil {
-		aes = customCharset
-	}
+	aes := DesEncryptData(
+		BaseEncode(BaseEncode(customCharset, "32").ToString(), "64").ToString(),
+		"ECB", "PKCS7",
+		HashGenerator(customCharset, "Md5").ToRawBytes(), nil).ToRawString()
 	customCharset = uniqueChars(customCharset + aes)
 
 	stableIndex := map[int]bool{}
