@@ -15,3 +15,11 @@ func TestHash(t *testing.T) {
 	fmt.Println(decode.ToString())
 	fmt.Println(decode.ToString() == md5.ToHexString())
 }
+
+func TestHex(t *testing.T) {
+	raw := "61615616"
+	decode := HexDecode(raw)
+	fmt.Println(decode.ToString())
+	encode := HexEncode(decode.ToString())
+	fmt.Println(encode.ToString())
+}
