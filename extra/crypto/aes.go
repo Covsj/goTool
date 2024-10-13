@@ -5,6 +5,9 @@ import (
 	"strings"
 )
 
+// des key 长度必须是 8 字节 iv 长度必须是 8 字节
+// 3des key 长度必须是 24 iv 长度必须是 8
+// aes key 长度必须是 16、24 或 32 字节, iv 长度必须是 16 字节，ECB 模式不需要设置 iv
 func NewCipher(mode, padding string, key, iv interface{}) *dongle.Cipher {
 	mode, padding = strings.ToUpper(mode), strings.ToUpper(padding)
 	cipher := dongle.NewCipher()
@@ -38,9 +41,7 @@ func NewCipher(mode, padding string, key, iv interface{}) *dongle.Cipher {
 	case "ISO97971":
 		cipher.SetPadding(dongle.ISO97971)
 	}
-	// des key 长度必须是 8 字节 iv 长度必须是 8 字节
-	// 3des key 长度必须是 24 iv 长度必须是 8
-	// aes key 长度必须是 16、24 或 32 字节, iv 长度必须是 16 字节，ECB 模式不需要设置 iv
+
 	cipher.SetKey(key)
 	if iv != nil {
 		cipher.SetIV(iv)

@@ -23,3 +23,12 @@ func TestHex(t *testing.T) {
 	encode := HexEncode(decode.ToString())
 	fmt.Println(encode.ToString())
 }
+
+func TestHmac(t *testing.T) {
+	hmac := HmacGenerator("hello world", "Sha512-224", "hmac-sha512-224")
+	fmt.Println(hmac.ToHexString())
+
+	hmac = HmacGenerator(hmac.ToHexString(), "TestHmac", "hmac-ripemd160")
+	fmt.Println(hmac.ToHexString())
+
+}

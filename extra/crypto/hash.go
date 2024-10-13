@@ -27,52 +27,49 @@ func HashGenerator(encryptData interface{}, encryptMode string) dongle.Encrypter
 	// 定义一个映射表，将加密模式与加密操作关联
 	encryptMode = strings.ToLower(encryptMode)
 	encryptFuncMap := map[string]func([]byte) dongle.Encrypter{
-		"Md2":        func(data []byte) dongle.Encrypter { return dongle.Encrypt.FromBytes(data).ByMd2() },
-		"Md4":        func(data []byte) dongle.Encrypter { return dongle.Encrypt.FromBytes(data).ByMd4() },
-		"Md5":        func(data []byte) dongle.Encrypter { return dongle.Encrypt.FromBytes(data).ByMd5() },
-		"Sha1":       func(data []byte) dongle.Encrypter { return dongle.Encrypt.FromBytes(data).BySha1() },
-		"Sha3-224":   func(data []byte) dongle.Encrypter { return dongle.Encrypt.FromBytes(data).BySha3(224) },
-		"Sha3-256":   func(data []byte) dongle.Encrypter { return dongle.Encrypt.FromBytes(data).BySha3(256) },
-		"Sha3-384":   func(data []byte) dongle.Encrypter { return dongle.Encrypt.FromBytes(data).BySha3(384) },
-		"Sha3-512":   func(data []byte) dongle.Encrypter { return dongle.Encrypt.FromBytes(data).BySha3(512) },
-		"Sha224":     func(data []byte) dongle.Encrypter { return dongle.Encrypt.FromBytes(data).BySha224() },
-		"Sha256":     func(data []byte) dongle.Encrypter { return dongle.Encrypt.FromBytes(data).BySha256() },
-		"Sha384":     func(data []byte) dongle.Encrypter { return dongle.Encrypt.FromBytes(data).BySha384() },
-		"Sha512":     func(data []byte) dongle.Encrypter { return dongle.Encrypt.FromBytes(data).BySha512() },
-		"Sha512-224": func(data []byte) dongle.Encrypter { return dongle.Encrypt.FromBytes(data).BySha512(224) },
-		"Sha512-256": func(data []byte) dongle.Encrypter { return dongle.Encrypt.FromBytes(data).BySha512(256) },
-		"Shake128-256": func(data []byte) dongle.Encrypter {
+		"md2":        func(data []byte) dongle.Encrypter { return dongle.Encrypt.FromBytes(data).ByMd2() },
+		"md4":        func(data []byte) dongle.Encrypter { return dongle.Encrypt.FromBytes(data).ByMd4() },
+		"md5":        func(data []byte) dongle.Encrypter { return dongle.Encrypt.FromBytes(data).ByMd5() },
+		"sha1":       func(data []byte) dongle.Encrypter { return dongle.Encrypt.FromBytes(data).BySha1() },
+		"sha3-224":   func(data []byte) dongle.Encrypter { return dongle.Encrypt.FromBytes(data).BySha3(224) },
+		"sha3-256":   func(data []byte) dongle.Encrypter { return dongle.Encrypt.FromBytes(data).BySha3(256) },
+		"sha3-384":   func(data []byte) dongle.Encrypter { return dongle.Encrypt.FromBytes(data).BySha3(384) },
+		"sha3-512":   func(data []byte) dongle.Encrypter { return dongle.Encrypt.FromBytes(data).BySha3(512) },
+		"sha224":     func(data []byte) dongle.Encrypter { return dongle.Encrypt.FromBytes(data).BySha224() },
+		"sha256":     func(data []byte) dongle.Encrypter { return dongle.Encrypt.FromBytes(data).BySha256() },
+		"sha384":     func(data []byte) dongle.Encrypter { return dongle.Encrypt.FromBytes(data).BySha384() },
+		"sha512":     func(data []byte) dongle.Encrypter { return dongle.Encrypt.FromBytes(data).BySha512() },
+		"sha512-224": func(data []byte) dongle.Encrypter { return dongle.Encrypt.FromBytes(data).BySha512(224) },
+		"sha512-256": func(data []byte) dongle.Encrypter { return dongle.Encrypt.FromBytes(data).BySha512(256) },
+		"shake128-256": func(data []byte) dongle.Encrypter {
 			return dongle.Encrypt.FromBytes(data).ByShake128(256)
 		},
-		"Shake128-512": func(data []byte) dongle.Encrypter {
+		"shake128-512": func(data []byte) dongle.Encrypter {
 			return dongle.Encrypt.FromBytes(data).ByShake128(512)
 		},
-		"Shake256-384": func(data []byte) dongle.Encrypter {
+		"shake256-384": func(data []byte) dongle.Encrypter {
 			return dongle.Encrypt.FromBytes(data).ByShake256(384)
 		},
-		"Shake256-512": func(data []byte) dongle.Encrypter {
+		"shake256-512": func(data []byte) dongle.Encrypter {
 			return dongle.Encrypt.FromBytes(data).ByShake256(512)
 		},
-		"Ripemd160": func(data []byte) dongle.Encrypter {
+		"ripemd160": func(data []byte) dongle.Encrypter {
 			return dongle.Encrypt.FromBytes(data).ByRipemd160()
 		},
-		"Blake2b-256": func(data []byte) dongle.Encrypter {
+		"blake2b-256": func(data []byte) dongle.Encrypter {
 			return dongle.Encrypt.FromBytes(data).ByBlake2b(256)
 		},
-		"Blake2b-384": func(data []byte) dongle.Encrypter {
+		"blake2b-384": func(data []byte) dongle.Encrypter {
 			return dongle.Encrypt.FromBytes(data).ByBlake2b(384)
 		},
-		"Blake2b-512": func(data []byte) dongle.Encrypter {
+		"blake2b-512": func(data []byte) dongle.Encrypter {
 			return dongle.Encrypt.FromBytes(data).ByBlake2b(512)
 		},
-		"Blake2s-256": func(data []byte) dongle.Encrypter {
+		"blake2s-256": func(data []byte) dongle.Encrypter {
 			return dongle.Encrypt.FromBytes(data).ByBlake2s(256)
 		},
 	}
 
-	for key, f := range encryptFuncMap {
-		encryptFuncMap[strings.ToLower(key)] = f
-	}
 	// 获取加密数据的字节形式
 	var dataBytes []byte
 	switch v := encryptData.(type) {
@@ -124,9 +121,6 @@ func HmacGenerator(encryptData, encryptKey interface{}, encryptMode string) dong
 		},
 	}
 
-	for key, f := range encryptFuncMap {
-		encryptFuncMap[strings.ToLower(key)] = f
-	}
 	// 获取加密数据的字节形式
 	var dataBytes []byte
 	switch v := encryptData.(type) {
