@@ -8,12 +8,11 @@ import (
 
 func request(uri string, solverRequest *Request) (*Response, error) {
 	capResponse := &Response{}
-	_, _, err := http.SendWithRetries(&http.RequestOptions{
-		Retries:     2,
-		URL:         fmt.Sprintf("%s%s", ApiHost, uri),
-		Body:        solverRequest,
-		Headers:     map[string]string{"Content-Type": "application/json"},
-		ResponseOut: capResponse,
+	_, err := http.DoRequest(&http.ReqOpt{
+		Url:     fmt.Sprintf("%s%s", ApiHost, uri),
+		Body:    solverRequest,
+		Headers: map[string]string{"Content-Type": "application/json"},
+		RespOut: capResponse,
 	})
 
 	if err != nil {

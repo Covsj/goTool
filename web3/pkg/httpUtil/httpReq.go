@@ -47,9 +47,9 @@ func Get(baseUrl string, param map[string]string, out interface{}) (err error) {
 		urlPath = httpUrl.String()
 	}
 
-	resp, body, err := localhttp.Get(urlPath, out)
+	resp, err := localhttp.DoRequest(&localhttp.ReqOpt{Url: urlPath, RespOut: out})
 	if err != nil {
-		log.Error("请求失败", "url", urlPath, "error", err, "body", string(body), "resp", &resp)
+		log.Error("请求失败", "url", urlPath, "error", err, "resp", resp)
 		return err
 	}
 	return nil

@@ -14,10 +14,10 @@ type ReqOpt struct {
 	Method               string
 	Url                  string
 	Headers              map[string]string
-	Result               interface{}
+	RespOut              interface{}
 	RetryCount           int
 	Body                 interface{}
-	FormData             map[string]string
+	FormData             map[string]interface{}
 	EnableForceMultipart bool
 	NeedSkipTls          bool
 }
@@ -34,8 +34,8 @@ func DoRequest(opt *ReqOpt) (*req.Response, error) {
 	if opt.Headers != nil {
 		request = request.SetHeaders(opt.Headers)
 	}
-	if opt.Result != nil {
-		request = request.SetSuccessResult(opt.Result)
+	if opt.RespOut != nil {
+		request = request.SetSuccessResult(opt.RespOut)
 	}
 	if opt.Body != nil {
 		request = request.SetBody(opt.Body)
@@ -44,7 +44,7 @@ func DoRequest(opt *ReqOpt) (*req.Response, error) {
 		request = request.EnableForceMultipart()
 	}
 	if opt.FormData != nil {
-		request = request.SetFormData(opt.FormData)
+		request = request.SetFormDataAnyType(opt.FormData)
 	}
 
 	switch opt.Method {

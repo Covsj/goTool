@@ -26,10 +26,10 @@ func (h *HaoZhuMaHandler) Login(user, password string) {
 	reqUrl := fmt.Sprintf("%s/sms/?api=login&user=%s&pass=%s", domain, user, password)
 	res := &LoginResp{}
 
-	resp, respBody, err := http.Get(reqUrl, res)
+	_, err := http.DoRequest(&http.ReqOpt{Url: reqUrl, RespOut: res})
 	if err != nil {
 		log.Error("豪猪码登陆失败", "user", user, "password", password,
-			"Error", err.Error(), "Status", resp.Status, "RespBody", string(respBody))
+			"Error", err.Error())
 		return
 	}
 
@@ -56,10 +56,10 @@ func (h *HaoZhuMaHandler) GetPhone(sid string) string {
 		"&sid=%s&ascription=2&isp=&isp=&Province=&sp=2&paragraph=&isp=1", domain, h.token, sid)
 	for i := 0; i < 5; i++ {
 		res := &PhoneResp{}
-		resp, respBody, err := http.Get(reqUrl, res)
+		_, err := http.DoRequest(&http.ReqOpt{Url: reqUrl, RespOut: res})
 		if err != nil {
 			log.Error("获取号码失败", "sid", sid,
-				"Error", err.Error(), "Status", resp.Status, "RespBody", string(respBody))
+				"Error", err.Error())
 			continue
 		}
 		mobile := res.Phone
@@ -82,10 +82,10 @@ func (h *HaoZhuMaHandler) GetMessage(sid, phone string) (string, string) {
 	reqUrl := fmt.Sprintf("%s/sms/?api=getMessage&token=%s&sid=%s&phone=%s", domain, h.token, sid, phone)
 	for i := 0; i < 20; i++ {
 		res := &MessageResp{}
-		resp, respBody, err := http.Get(reqUrl, res)
+		_, err := http.DoRequest(&http.ReqOpt{Url: reqUrl, RespOut: res})
 		if err != nil {
 			log.Error("获取验证码失败", "sid", sid,
-				"Error", err.Error(), "Status", resp.Status, "RespBody", string(respBody))
+				"Error", err.Error())
 			continue
 		}
 		log.Info("正在获取验证码", "phone", phone, "res", res)

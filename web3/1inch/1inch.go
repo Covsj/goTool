@@ -1,8 +1,6 @@
 package _inch
 
 import (
-	"encoding/json"
-
 	gotool_http "github.com/Covsj/goTool/http"
 )
 
@@ -10,14 +8,10 @@ func Get1inchCheckAllowance(chainId, tokenAddress, walletAddress string, url str
 	if url == "" {
 		url = getBaseApiUrl(chainId)
 	}
+	m := &TokenAllowance{}
 	url += "/approve/allowance?tokenAddress=" + tokenAddress + "&walletAddress=" + walletAddress
-	_, body, err := gotool_http.Send(&gotool_http.RequestOptions{URL: url})
+	_, err := gotool_http.DoRequest(&gotool_http.ReqOpt{Url: url, RespOut: m})
 	//fmt.Println(resp, string(body))
-	if err != nil {
-		return "", err
-	}
-	var m TokenAllowance
-	err = json.Unmarshal(body, &m)
 	if err != nil {
 		return "", err
 	}
@@ -30,12 +24,8 @@ func Approve1inchToken(chainId, tokenAddress, amount string) (*Web3Call, error) 
 	if amount != "" {
 		url += "&amount=" + amount
 	}
-	_, body, err := gotool_http.Send(&gotool_http.RequestOptions{URL: url})
-	if err != nil {
-		return nil, err
-	}
 	m := &Web3Call{GasLimit: "200000"}
-	err = json.Unmarshal(body, m)
+	_, err := gotool_http.DoRequest(&gotool_http.ReqOpt{Url: url, RespOut: m})
 	if err != nil {
 		return nil, err
 	}
