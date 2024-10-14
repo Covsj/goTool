@@ -7,7 +7,7 @@ import (
 
 func TestGet(t *testing.T) {
 	ss := &T{}
-	resp, err := WithOutDoRequest(&ReqOpt{Method: "GET", Url: "https://gmgn.ai/defi/quotation/v1/signals?size=10", Result: &ss})
+	resp, err := DoRequest(&ReqOpt{Method: "GET", Url: "https://gmgn.ai/defi/quotation/v1/signals?size=10", RespOut: &ss})
 	if err != nil {
 		fmt.Println(err.Error())
 		return
